@@ -1,8 +1,6 @@
 package br.com.projeto_letramento.projeto_letramento.service;
 
 import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.projeto_letramento.projeto_letramento.model.ProfessorModel;
@@ -10,10 +8,11 @@ import br.com.projeto_letramento.projeto_letramento.repository.ProfessorReposito
 
 @Service
 public class ProfessorService {
-    @Autowired
-    private ProfessorRepository professorRepository;
-    ProfessorService(){
 
+    private ProfessorRepository professorRepository;
+
+    ProfessorService(ProfessorRepository professorRepository){
+        this.professorRepository = professorRepository;
     }
     //aqui
     public ProfessorModel salvar(ProfessorModel professor){
@@ -64,9 +63,6 @@ public class ProfessorService {
         professorRepository.deleteById(id);
     }
     //terminaaqui
-    ProfessorService(ProfessorRepository professorRepository){
-        this.professorRepository = professorRepository;
-    }
 
     
 }
