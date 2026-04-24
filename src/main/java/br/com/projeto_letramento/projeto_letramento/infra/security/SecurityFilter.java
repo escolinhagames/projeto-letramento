@@ -33,11 +33,9 @@ public class SecurityFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         var token = recoverToken(request);
-        System.out.println(">>> TOKEN RECEBIDO: " + token);
 
         if (token != null) {
             var login = tokenService.validateToken(token);
-            System.out.println(">>> LOGIN VALIDADO: " + login);
 
             if (login != null) {
                 ProfessorModel professorModel = professorRepository

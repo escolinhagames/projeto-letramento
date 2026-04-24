@@ -19,7 +19,6 @@ import br.com.projeto_letramento.projeto_letramento.service.ProfessorService;
 public class ProfessorController {
     // @PostMapping("/")
     // public void create(@RequestBody ProfessorModel ProfessorModel){
-    //     System.out.println(ProfessorModel.getNome());
     // }
     
     ProfessorController(ProfessorService professorService){
