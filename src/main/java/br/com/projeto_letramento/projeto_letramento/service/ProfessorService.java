@@ -17,7 +17,7 @@ public class ProfessorService {
         this.professorRepository = professorRepository;
         this.passwordEncoder = passwordEncoder;
     }
-
+    
     public ProfessorModel salvar(ProfessorModel professor){
         if (professor.getSenha() != null && !professor.getSenha().isEmpty()) {
             professor.setSenha(passwordEncoder.encode(professor.getSenha()));
@@ -25,18 +25,15 @@ public class ProfessorService {
         return professorRepository.save(professor);
     }
 
-    // LISTAR TODOS
     public List<ProfessorModel> listar(){
         return professorRepository.findAll();
     }
 
-    // BUSCAR POR ID
     public ProfessorModel buscarPorId(Integer id){
         return professorRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Professor não encontrado"));
     }
 
-    // LOGIN
     public ProfessorModel login(String email, String senha){
         ProfessorModel professor = professorRepository.findByEmail(email);
 
@@ -47,14 +44,11 @@ public class ProfessorService {
         return professor;
     }
 
-    // ALTERAR SENHA
     public ProfessorModel alterarSenha(Integer id, String novaSenha){
         ProfessorModel professor = buscarPorId(id);
         professor.setSenha(passwordEncoder.encode(novaSenha));
         return professorRepository.save(professor);
     }
-
-    // ATUALIZAR DADOS
     public ProfessorModel atualizar(Integer id, ProfessorModel dados){
         ProfessorModel professor = buscarPorId(id);
 
@@ -64,8 +58,9 @@ public class ProfessorService {
         return professorRepository.save(professor);
     }
 
-    // DELETAR
     public void deletar(Integer id){
         professorRepository.deleteById(id);
     }
+
+    
 }

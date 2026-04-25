@@ -1,6 +1,5 @@
 package br.com.projeto_letramento.projeto_letramento.infra.security;
 
-
 import br.com.projeto_letramento.projeto_letramento.model.ProfessorModel;
 import br.com.projeto_letramento.projeto_letramento.repository.ProfessorRepository;
 import jakarta.servlet.FilterChain;
@@ -18,12 +17,13 @@ import java.util.Collections;
 
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
-    
-    TokenService tokenService;
-    ProfessorRepository professorRepository;
-    SecurityFilter(TokenService tokenService,ProfessorRepository professorRepository){
-        this.tokenService=tokenService;
-        this.professorRepository=professorRepository;
+
+    private final TokenService tokenService;
+    private final ProfessorRepository professorRepository;
+
+    public SecurityFilter(TokenService tokenService, ProfessorRepository professorRepository) {
+        this.tokenService = tokenService;
+        this.professorRepository = professorRepository;
     }
 
     @Override
@@ -57,12 +57,15 @@ public class SecurityFilter extends OncePerRequestFilter {
             var authentication = new UsernamePasswordAuthenticationToken(professorModel, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
+
         filterChain.doFilter(request, response);
     }
 
-    private String recoverToken(HttpServletRequest request){
+    private String recoverToken(HttpServletRequest request) {
         var authHeader = request.getHeader("Authorization");
-        if(authHeader == null) return null;
-        return authHeader.replace("Bearer ", "");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) return null;
+
+        return authHeader.substring(7); 
     }
 }

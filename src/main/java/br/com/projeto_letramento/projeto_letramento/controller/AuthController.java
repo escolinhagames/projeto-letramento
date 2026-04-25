@@ -39,7 +39,7 @@ public class AuthController {
                 .orElseThrow(() -> new RuntimeException("User not found"));
         if(passwordEncoder.matches(senha, professorModel.getSenha())) {
             String token = this.tokenService.generateToken(professorModel);
-            return ResponseEntity.ok(new ResponseDTO(professorModel.getNome(), token));
+            return ResponseEntity.ok(new ResponseDTO(professorModel.getNome(), token, professorModel.getId()));
         }
         return ResponseEntity.badRequest().build();
     }
@@ -62,7 +62,7 @@ public class AuthController {
             this.repository.save(newProfessorModel);
 
             String token = this.tokenService.generateToken(newProfessorModel);
-            return ResponseEntity.ok(new ResponseDTO(newProfessorModel.getNome(), token));
+            return ResponseEntity.ok(new ResponseDTO(newProfessorModel.getNome(), token, newProfessorModel.getId()));
         }
         return ResponseEntity.badRequest().build();
     }
