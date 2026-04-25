@@ -1,6 +1,7 @@
 package br.com.projeto_letramento.projeto_letramento.service;
 
 import java.util.List;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import br.com.projeto_letramento.projeto_letramento.model.ProfessorModel;
@@ -9,13 +10,18 @@ import br.com.projeto_letramento.projeto_letramento.repository.ProfessorReposito
 @Service
 public class ProfessorService {
 
-    private ProfessorRepository professorRepository;
+    private final ProfessorRepository professorRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    ProfessorService(ProfessorRepository professorRepository){
+    ProfessorService(ProfessorRepository professorRepository, PasswordEncoder passwordEncoder){
         this.professorRepository = professorRepository;
+        this.passwordEncoder = passwordEncoder;
     }
-    //aqui
+
     public ProfessorModel salvar(ProfessorModel professor){
+        if (professor.getSenha() != null && !professor.getSenha().isEmpty()) {
+            professor.setSenha(passwordEncoder.encode(professor.getSenha()));
+        }
         return professorRepository.save(professor);
     }
 
@@ -32,9 +38,9 @@ public class ProfessorService {
 
     // LOGIN
     public ProfessorModel login(String email, String senha){
-        ProfessorModel professor = professorRepository.findByEmailAndSenha(email, senha);
+        ProfessorModel professor = professorRepository.findByEmail(email);
 
-        if(professor == null){
+        if(professor == null || !passwordEncoder.matches(senha, professor.getSenha())){
             throw new RuntimeException("Email ou senha inválidos");
         }
 
@@ -44,7 +50,7 @@ public class ProfessorService {
     // ALTERAR SENHA
     public ProfessorModel alterarSenha(Integer id, String novaSenha){
         ProfessorModel professor = buscarPorId(id);
-        professor.setSenha(novaSenha);
+        professor.setSenha(passwordEncoder.encode(novaSenha));
         return professorRepository.save(professor);
     }
 
@@ -62,7 +68,4 @@ public class ProfessorService {
     public void deletar(Integer id){
         professorRepository.deleteById(id);
     }
-    //terminaaqui
-
-    
 }

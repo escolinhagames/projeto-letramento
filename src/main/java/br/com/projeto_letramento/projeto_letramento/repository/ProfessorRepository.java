@@ -11,8 +11,6 @@ import br.com.projeto_letramento.projeto_letramento.model.ProfessorModel;
 public interface ProfessorRepository extends JpaRepository<ProfessorModel, Integer>{
     
     //@Query("select p from ProfessorModel p whare p. ")
-    ProfessorModel findByEmailAndSenha(String email, String senha);
-
     ProfessorModel findByEmail(String email);
     Optional<ProfessorModel> findOptionalByEmail(String email);
 }

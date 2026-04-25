@@ -11,6 +11,7 @@ import br.com.projeto_letramento.projeto_letramento.repository.ProfessorReposito
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/auth")
+@CrossOrigin(origins = "*")
+@RequestMapping({"/auth", ""})
 @RequiredArgsConstructor
 public class AuthController {
     private final ProfessorRepository repository;
@@ -27,7 +29,7 @@ public class AuthController {
     private final TokenService tokenService;
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody LoginRequestDTO body){
+    public ResponseEntity<ResponseDTO> login(@RequestBody LoginRequestDTO body){
         ProfessorModel professorModel = this.repository.findOptionalByEmail(body.email()).orElseThrow(() -> new RuntimeException("User not found"));
         if(passwordEncoder.matches(body.senha(), professorModel.getSenha())) {
             String token = this.tokenService.generateToken(professorModel);
@@ -38,7 +40,7 @@ public class AuthController {
 
 
     @PostMapping("/register")
-    public ResponseEntity register(@RequestBody RegisterRequestDTO body){
+    public ResponseEntity<ResponseDTO> register(@RequestBody RegisterRequestDTO body){
         Optional<ProfessorModel> professorModel = this.repository.findOptionalByEmail(body.email());
 
         if(professorModel.isEmpty()) {

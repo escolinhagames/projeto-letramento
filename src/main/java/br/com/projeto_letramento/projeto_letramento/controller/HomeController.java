@@ -1,0 +1,13 @@
+package br.com.projeto_letramento.projeto_letramento.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+
+@Controller
+public class HomeController {
+    
+    @GetMapping("/embaralhar")
+    public String home() {
+        return "index";
+    }
+}

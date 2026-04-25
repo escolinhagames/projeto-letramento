@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bingo Infantil</title>
+
+<style>
+
+body{
+font-family:Arial;
+text-align:center;
+background:#f4f4f4;
+margin:0;
+padding:20px;
+}
+
+h1{
+color:#333;
+margin:10px 0;
+}
+
+.info{
+display:flex;
+justify-content:center;
+gap:40px;
+margin:20px 0;
+font-size:16px;
+}
+
+.info-item{
+background:white;
+padding:15px 25px;
+border-radius:8px;
+box-shadow:0 2px 5px rgba(0,0,0,0.1);
+}
+
+.info-item strong{
+color:#2196F3;
+}
+
+#sorteado{
+font-size:28px;
+color:#FF5722;
+margin:20px 0;
+min-height:40px;
+}
+
+.cartela{
+display:flex;
+gap:10px;
+justify-content:center;
+margin:30px 0;
+flex-wrap:wrap;
+}
+
+.coluna{
+display:grid;
+gap:10px;
+width: 72px;
+}
+
+.animal-icon{
+font-size:24px;
+margin-bottom:8px;
+}
+
+.numero{
+background:white;
+padding:16px 10px;
+border:2px solid #ccc;
+font-size:18px;
+font-weight:bold;
+cursor:pointer;
+border-radius:8px;
+transition:all 0.3s;
+min-height:90px;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+}
+
+.numero:hover{
+transform:scale(1.05);
+box-shadow:0 4px 8px rgba(0,0,0,0.2);
+}
+
+.marcado{
+background:#90ee90;
+border-color:#45a049;
+font-weight:bold;
+}
+
+.sorteado-nao-marcado{
+border:3px solid #FF5722;
+background:#FFF3E0;
+}
+
+button{
+padding:12px 30px;
+font-size:18px;
+margin:10px 5px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+transition:all 0.3s;
+}
+
+#sortear{
+background:#FF9800;
+color:white;
+}
+
+#sortear:hover{
+background:#F57C00;
+}
+
+#reiniciar{
+background:#4CAF50;
+color:white;
+}
+
+#reiniciar:hover{
+background:#388E3C;
+}
+
+#vitoria{
+display:none;
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:white;
+padding:40px;
+border-radius:15px;
+box-shadow:0 5px 20px rgba(0,0,0,0.3);
+text-align:center;
+z-index:1000;
+}
+
+#vitoria h2{
+color:#4CAF50;
+font-size:36px;
+margin:0;
+}
+
+#vitoria p{
+font-size:18px;
+color:#666;
+}
+
+.overlay{
+display:none;
+position:fixed;
+top:0;
+left:0;
+right:0;
+bottom:0;
+background:rgba(0,0,0,0.5);
+z-index:999;
+}
+
+.historico{
+background:white;
+padding:20px;
+margin:20px auto;
+border-radius:8px;
+max-width:500px;
+box-shadow:0 2px 5px rgba(0,0,0,0.1);
+}
+
+.historico h3{
+margin-top:0;
+color:#333;
+}
+
+#sorteados-list{
+display:flex;
+flex-wrap:wrap;
+gap:8px;
+justify-content:center;
+min-height:30px;
+}
+
+.numero-sorteado{
+background:#E3F2FD;
+padding:5px 12px;
+border-radius:6px;
+border-left:4px solid #2196F3;
+font-weight:bold;
+color:#1976D2;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>🎲 Bingo Infantil 🎲</h1>
+
+<div class="info">
+<div class="info-item">
+Números marcados: <strong id="marcados">0</strong>/9
+</div>
+<div class="info-item">
+Faltam: <strong id="faltam">9</strong> números
+</div>
+</div>
+
+<h2 id="sorteado">Aguardando sorteio...</h2>
+
+<div id="cartela" class="cartela"></div>
+
+<button id="sortear" onclick="sortear()">Sortear</button>
+<button id="reiniciar" onclick="reiniciar()">Novo Jogo</button>
+
+<div class="historico">
+<h3>Números Sorteados:</h3>
+<div id="sorteados-list"></div>
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+<div id="vitoria">
+<h2>🎉 PARABÉNS! 🎉</h2>
+<p>Você completou seu cartela!</p>
+<button onclick="reiniciar()">Jogar Novamente</button>
+</div>
+
+<script>
+
+let cartela=[]
+let sorteados=[]
+let numerosClicados=[]
+let ganhou=false
+
+function getAnimalEmoji(numero) {
+ if (numero >= 1 && numero <= 10) return '🐶'
+ if (numero >= 11 && numero <= 20) return '🐱'
+ if (numero >= 21 && numero <= 30) return '🦆'
+ if (numero >= 31 && numero <= 40) return '🐰'
+ if (numero >= 41 && numero <= 50) return '🐸'
+ return '🦁'
+}
+
+async function gerarCartela(){
+ let res = await fetch("/bingo/cartela")
+ cartela = await res.json()
+ cartela.sort((a, b) => a - b)
+
+ let colunas = [[], [], [], [], []]
+ cartela.forEach((n, index) => {
+   const colunaIndex = Math.floor(index / 5)
+   colunas[colunaIndex].push(n)
+ })
+
+ let div = document.getElementById("cartela")
+ div.innerHTML = ""
+
+ colunas.forEach(colunaNums => {
+   const coluna = document.createElement("div")
+   coluna.className = "coluna"
+   colunaNums.forEach(n => {
+     let d = document.createElement("div")
+     d.className = "numero"
+     d.id = "n" + n
+     d.innerHTML = `<div class="animal-icon">${getAnimalEmoji(n)}</div><div>${n}</div>`
+     d.onclick = function(){ marcarNumero(n) }
+     coluna.appendChild(d)
+   })
+   div.appendChild(coluna)
+ })
+
+ atualizarContador()
+}
+
+async function sortear(){
+if(ganhou) return
+
+let res = await fetch("/bingo/sortear")
+let numero = await res.json()
+
+sorteados.push(numero)
+
+document.getElementById("sorteado").innerText="Número sorteado: "+numero
+
+let celula = document.getElementById("n"+numero)
+if(celula){
+celula.classList.add("sorteado-nao-marcado")
+}
+
+atualizarHistorico()
+}
+
+function marcarNumero(numero){
+let celula = document.getElementById("n"+numero)
+if(!celula) return
+
+if(celula.classList.contains("marcado")){
+celula.classList.remove("marcado")
+numerosClicados = numerosClicados.filter(n => n !== numero)
+} else {
+celula.classList.add("marcado")
+celula.classList.remove("sorteado-nao-marcado")
+if(!numerosClicados.includes(numero)){
+numerosClicados.push(numero)
+}
+}
+
+atualizarContador()
+verificarVitoria()
+}
+
+function atualizarContador(){
+let marcados = numerosClicados.length
+let faltam = 9 - marcados
+document.getElementById("marcados").innerText = marcados
+document.getElementById("faltam").innerText = faltam
+}
+
+function atualizarHistorico(){
+let lista = document.getElementById("sorteados-list")
+lista.innerHTML = sorteados.map(n => `<span class="numero-sorteado">${n}</span>`).join("")
+}
+
+function verificarVitoria(){
+if(numerosClicados.length === 9){
+ganhou = true
+document.getElementById("overlay").style.display = "block"
+document.getElementById("vitoria").style.display = "block"
+document.getElementById("sortear").disabled = true
+}
+}
+
+async function reiniciar(){
+let res = await fetch("/bingo/reset")
+sorteados = []
+numerosClicados = []
+ganhou = false
+document.getElementById("sorteado").innerText = "Aguardando sorteio..."
+document.getElementById("overlay").style.display = "none"
+document.getElementById("vitoria").style.display = "none"
+document.getElementById("sortear").disabled = false
+gerarCartela()
+}
+
+gerarCartela()
+
+</script>
+
+</body>
+
+</html>
