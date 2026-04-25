@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aluno - Jogo Embaralhar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4ECDC4 0%, #44A3A0 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #4ECDC4;
+            padding-bottom: 20px;
+        }
+        
+        h1 {
+            color: #4ECDC4;
+            font-size: 2.5rem;
+        }
+        
+        .btn-voltar {
+            background-color: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-voltar:hover {
+            background-color: #764ba2;
+        }
+        
+        .empty-message {
+            text-align: center;
+            color: #999;
+            padding: 40px 20px;
+            font-size: 1.2rem;
+        }
+        
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .game-card {
+            background: white;
+            border: 2px solid #4ECDC4;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .game-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .game-card h3 {
+            color: #4ECDC4;
+            margin-bottom: 10px;
+        }
+        
+        .btn-jogar {
+            background-color: #4ECDC4;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+        
+        .btn-jogar:hover {
+            background-color: #44A3A0;
+        }
+        
+        h2 {
+            color: #4ECDC4;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👨‍🎓 Escolha um Jogo</h1>
+            <a href="/embaralhar" class="btn-voltar">← Voltar</a>
+        </div>
+        
+        <h2>Jogos Disponíveis</h2>
+        
+        <div th:if="${games.isEmpty()}" class="empty-message">
+            Nenhum jogo disponível no momento. Tente novamente mais tarde!
+        </div>
+        
+        <div class="games-grid" th:if="${!games.isEmpty()}">
+            <div class="game-card" th:each="game : ${games}">
+                <img th:src="'data:image/jpeg;base64,' + ${imageMap[game.id]}" 
+                     th:alt="Jogo">
+                <h3>Desafio #<span th:text="${game.id}"></span></h3>
+                <p style="color: #999; margin-bottom: 15px;">Adivinhe a palavra!</p>
+                <a th:href="'/embaralhar/aluno/jogo/' + ${game.id}" class="btn-jogar">Jogar →</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Jogo - Jogo Embaralhar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E72 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #FF6B6B;
+            padding-bottom: 20px;
+        }
+        
+        h1 {
+            color: #FF6B6B;
+            font-size: 2.5rem;
+        }
+        
+        .btn-voltar {
+            background-color: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-voltar:hover {
+            background-color: #764ba2;
+        }
+        
+        .game-info {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: center;
+        }
+        
+        .game-image img {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .game-details h2 {
+            color: #FF6B6B;
+            margin-bottom: 20px;
+        }
+        
+        .detail-item {
+            margin-bottom: 15px;
+        }
+        
+        .detail-item label {
+            font-weight: bold;
+            color: #666;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .detail-item .value {
+            color: #333;
+            font-size: 1.1rem;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #FF6B6B;
+        }
+        
+        h3 {
+            color: #FF6B6B;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+        
+        .attempts-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        
+        .attempts-table thead {
+            background: #FF6B6B;
+            color: white;
+        }
+        
+        .attempts-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        .attempts-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .attempts-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .badge-correct {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .empty-message {
+            text-align: center;
+            color: #999;
+            padding: 40px 20px;
+            font-size: 1.1rem;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #FF6B6B;
+        }
+        
+        .stat-box .number {
+            font-size: 2rem;
+            color: #FF6B6B;
+            font-weight: bold;
+        }
+        
+        .stat-box .label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .game-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .attempts-table {
+                font-size: 0.9rem;
+            }
+            
+            .attempts-table th,
+            .attempts-table td {
+                padding: 8px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Detalhes do Jogo</h1>
+            <a href="/embaralhar/professor" class="btn-voltar">← Voltar</a>
+        </div>
+        
+        <div th:if="${game}" class="game-info">
+            <div class="game-image">
+                <img th:src="'data:image/jpeg;base64,' + ${imageBase64}" 
+                     th:alt="${game.word}">
+            </div>
+            <div class="game-details">
+                <h2>Informações do Jogo</h2>
+                <div class="detail-item">
+                    <label>Palavra Correta:</label>
+                    <div class="value" th:text="${#strings.toUpperCase(game.word)}"></div>
+                </div>
+                <div class="detail-item">
+                    <label>Status:</label>
+                    <div class="value">
+                        <span th:if="${game.active}" style="color: #28a745;">✓ Ativo</span>
+                        <span th:if="!${game.active}" style="color: #dc3545;">✗ Inativo</span>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <label>Criado em:</label>
+                    <div class="value" th:text="${#temporals.format(game.createdAt, 'dd/MM/yyyy HH:mm:ss')}"></div>
+                </div>
+                <div class="detail-item">
+                    <label>Total de Tentativas:</label>
+                    <div class="value" th:text="${tentativas.size()}"></div>
+                </div>
+            </div>
+        </div>
+        
+        <h3>Estatísticas</h3>
+        <div class="stats" th:if="${!tentativas.isEmpty()}">
+            <div class="stat-box">
+                <div class="number" th:text="${tentativas.size()}"></div>
+                <div class="label">Total de Tentativas</div>
+            </div>
+            <div class="stat-box">
+                <div class="number" th:text="${#lists.size(tentativas.?[correct == true])}"></div>
+                <div class="label">Acertos</div>
+            </div>
+            <div class="stat-box">
+                <div class="number" th:text="${#lists.size(tentativas.?[correct == false])}"></div>
+                <div class="label">Erros</div>
+            </div>
+        </div>
+        
+        <h3>Tentativas dos Alunos</h3>
+        
+        <div th:if="${tentativas.isEmpty()}" class="empty-message">
+            Nenhuma tentativa registrada ainda.
+        </div>
+        
+        <table class="attempts-table" th:if="${!tentativas.isEmpty()}">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Resposta do Aluno</th>
+                    <th>Status</th>
+                    <th>Hora da Tentativa</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="attempt, iterStat : ${tentativas}">
+                    <td th:text="${tentativas.size() - iterStat.index}"></td>
+                    <td th:text="${#strings.toUpperCase(attempt.studentAnswer)}"></td>
+                    <td>
+                        <span th:if="${attempt.correct}" class="badge badge-correct">✓ Correto</span>
+                        <span th:if="!${attempt.correct}" class="badge badge-incorrect">✗ Incorreto</span>
+                    </td>
+                    <td th:text="${#temporals.format(attempt.attemptedAt, 'dd/MM/yyyy HH:mm:ss')}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

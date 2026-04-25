@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bingo Infantil - Professor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="text"],
+        input[type="name"] {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="name"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f093fb;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #e07ce0;
+        }
+
+        .btn-success {
+            background: #4CAF50;
+            color: white;
+            width: 100%;
+            font-size: 24px;
+            padding: 20px;
+        }
+
+        .btn-success:hover {
+            background: #388E3C;
+        }
+
+        .info-box {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .numero-sorteado {
+            font-size: 72px;
+            font-weight: bold;
+            color: #667eea;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .stat-item {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .sorteados-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .numero-tag {
+            background: #667eea;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .status.success {
+            background: #c8e6c9;
+            color: #2e7d32;
+        }
+
+        .status.error {
+            background: #ffcdd2;
+            color: #c62828;
+        }
+
+        .alunos-list {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .aluno-item {
+            padding: 10px;
+            background: white;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge-bingo {
+            background: #4CAF50;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .cartela-professor {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .coluna-professor {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .numero-professor {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #f0f4ff 0%, #e8f0ff 100%);
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            position: relative;
+            cursor: default;
+        }
+
+        .numero-professor .animal-icon {
+            font-size: 24px;
+            margin-bottom: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎲 Bingo do Professor</h1>
+        <p class="subtitle">Crie uma sala e comece a sortear!</p>
+
+        <!-- Seção: Criar Sala -->
+        <div class="section" id="secaoCriar">
+            <h2 style="margin-bottom: 15px;">1. Criar Sala</h2>
+            <div class="form-group">
+                <input type="name" id="nomeProfessor" placeholder="Seu nome" value="">
+                <button class="btn-primary" onclick="criarSala()">Criar Sala</button>
+            </div>
+            <div id="statusCriar"></div>
+        </div>
+
+        <!-- Seção: Código da Sala -->
+        <div class="section hidden" id="secaoSala">
+            <div class="info-box">
+                <h3>Sua Sala Está Pronta!</h3>
+                <p style="margin-top: 10px;">Compartilhe este código com seus alunos:</p>
+                <div style="font-size: 48px; font-weight: bold; color: #667eea; text-align: center; margin: 20px 0;">
+                    <span id="codigoSala"></span>
+                </div>
+            </div>
+
+            <!-- Seção: Sua Cartela -->
+            <div style="margin-top: 30px;">
+                <h2 style="margin-bottom: 15px;">Sua Cartela Temática</h2>
+                <div class="cartela-professor" id="cartelaProfessor">
+                    <p style="color: #999; text-align: center;">Cartela será carregada após criar a sala...</p>
+                </div>
+            </div>
+
+            <!-- Seção: Sortear -->
+            <div style="margin-top: 30px;">
+                <h2 style="margin-bottom: 15px;">2. Sortear Números</h2>
+                
+                <div class="numero-sorteado" id="numeroDisplay">-</div>
+                
+                <button class="btn-success" onclick="sortearNumero()">SORTEAR</button>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-label">Sorteados</div>
+                        <div class="stat-value"><span id="totalSorteados">0</span>/50</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Alunos Conectados</div>
+                        <div class="stat-value" id="totalAlunos">0</div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 20px; margin-bottom: 10px;">Números Sorteados:</h3>
+                <div class="sorteados-list" id="sorteadosList"></div>
+            </div>
+
+            <!-- Seção: Alunos -->
+            <div style="margin-top: 30px;">
+                <h2 style="margin-bottom: 15px;">3. Acompanhar Alunos</h2>
+                <div class="alunos-list" id="listaAlunos">
+                    <p style="color: #999; text-align: center;">Aguardando alunos se conectarem...</p>
+                </div>
+            </div>
+
+            <!-- Botões de Controle -->
+            <div id="statusSala"></div>
+            <div style="margin-top: 30px; display: flex; gap: 10px;">
+                <button class="btn-secondary" onclick="resetarSala()" style="flex: 1;">Novo Jogo</button>
+                <button class="btn-secondary" onclick="encerrarSala()" style="flex: 1; background: #ff6b6b;">Encerrar Sala</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let codigoSalaAtual = null;
+        let sorteadosAtuais = [];
+        let alunosConectados = {};
+        let cartelaProfessor = [];
+
+        async function criarSala() {
+            const nome = document.getElementById('nomeProfessor').value.trim();
+            
+            if (!nome) {
+                mostrarStatus('statusCriar', 'Por favor, insira seu nome', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/bingo/sala/criar?professor=${encodeURIComponent(nome)}`, {
+                    method: 'POST'
+                });
+
+                if (!response.ok) throw new Error('Erro ao criar sala');
+
+                const data = await response.json();
+                codigoSalaAtual = data.codigo;
+
+                document.getElementById('codigoSala').textContent = codigoSalaAtual;
+                document.getElementById('secaoCriar').classList.add('hidden');
+                document.getElementById('secaoSala').classList.remove('hidden');
+
+                // Carregar cartela do professor
+                await carregarCartelaProfessor();
+
+                // Inicia monitoramento da sala
+                monitorarSala();
+                setInterval(monitorarSala, 2000);
+
+                mostrarStatus('statusCriar', `Sala ${data.codigo} criada com sucesso!`, 'success');
+            } catch (error) {
+                mostrarStatus('statusCriar', 'Erro ao criar sala: ' + error.message, 'error');
+            }
+        }
+
+        async function sortearNumero() {
+            if (!codigoSalaAtual) return;
+
+            try {
+                const response = await fetch(`/api/bingo/sala/${codigoSalaAtual}/sortear`, {
+                    method: 'POST'
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    alert(error.erro);
+                    return;
+                }
+
+                const data = await response.json();
+                
+                document.getElementById('numeroDisplay').textContent = data.numero;
+                document.getElementById('totalSorteados').textContent = data.totalSorteados;
+                
+                sorteadosAtuais = Array.from(data.sorteados);
+                atualizarListaSorteados();
+
+                // Efeito visual
+                document.getElementById('numeroDisplay').style.animation = 'none';
+                setTimeout(() => {
+                    document.getElementById('numeroDisplay').style.animation = 'pulse 0.5s';
+                }, 10);
+            } catch (error) {
+                alert('Erro ao sortear: ' + error.message);
+            }
+        }
+
+        async function resetarSala() {
+            if (!codigoSalaAtual) return;
+
+            if (!confirm('Deseja iniciar um novo jogo?')) {
+                mostrarStatus('statusSala', 'Operação cancelada', 'info');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/bingo/sala/${codigoSalaAtual}/reset`, {
+                    method: 'POST'
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    mostrarStatus('statusSala', 'Erro ao resetar: ' + error.erro, 'error');
+                    return;
+                }
+
+                document.getElementById('numeroDisplay').textContent = '-';
+                document.getElementById('totalSorteados').textContent = '0';
+                sorteadosAtuais = [];
+                atualizarListaSorteados();
+                monitorarSala();
+                
+                mostrarStatus('statusSala', 'Novo jogo iniciado!', 'success');
+            } catch (error) {
+                mostrarStatus('statusSala', 'Erro ao resetar: ' + error.message, 'error');
+            }
+        }
+
+        async function encerrarSala() {
+            if (!codigoSalaAtual) return;
+
+            if (!confirm('Deseja encerrar a sala? Todos os alunos serão desconectados.')) return;
+
+            try {
+                await fetch(`/api/bingo/sala/${codigoSalaAtual}/encerrar`, {
+                    method: 'POST'
+                });
+
+                location.reload();
+            } catch (error) {
+                alert('Erro ao encerrar: ' + error.message);
+            }
+        }
+
+        async function monitorarSala() {
+            if (!codigoSalaAtual) return;
+
+            try {
+                const response = await fetch(`/api/bingo/sala/${codigoSalaAtual}`);
+                if (!response.ok) return;
+
+                const data = await response.json();
+                
+                // Atualizar números sorteados
+                document.getElementById('numeroDisplay').textContent = data.sorteados.length > 0 ? data.sorteados[data.sorteados.length - 1] : '-';
+                document.getElementById('totalSorteados').textContent = data.totalSorteados;
+                sorteadosAtuais = Array.from(data.sorteados);
+                atualizarListaSorteados();
+                
+                document.getElementById('totalAlunos').textContent = data.totalAlunos;
+                alunosConectados = {};
+                
+                // Atualizar lista de alunos
+                const listaAlunos = document.getElementById('listaAlunos');
+                
+                if (data.totalAlunos === 0) {
+                    listaAlunos.innerHTML = '<p style="color: #999; text-align: center;">Aguardando alunos se conectarem...</p>';
+                } else {
+                    let html = '';
+                    data.alunos.forEach(aluno => {
+                        html += `<div class="aluno-item">
+                            <span>${aluno}</span>
+                            <span id="bingo-${aluno}">Jogando...</span>
+                        </div>`;
+                    });
+                    listaAlunos.innerHTML = html;
+
+                    // Verificar bingo de cada aluno
+                    data.alunos.forEach(aluno => verificarBingoAluno(aluno));
+                }
+            } catch (error) {
+                console.error('Erro ao monitorar sala:', error);
+            }
+        }
+
+        async function verificarBingoAluno(nome) {
+            if (!codigoSalaAtual) return;
+
+            try {
+                const response = await fetch(`/api/bingo/sala/${codigoSalaAtual}/aluno/${nome}/bingo`);
+                if (!response.ok) return;
+
+                const data = await response.json();
+                const elemento = document.getElementById(`bingo-${nome}`);
+                
+                if (elemento) {
+                    if (data.bingo) {
+                        elemento.innerHTML = '<span class="badge-bingo">🎉 BINGO!</span>';
+                    } else {
+                        elemento.innerHTML = 'Jogando...';
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao verificar bingo:', error);
+            }
+        }
+
+        function atualizarListaSorteados() {
+            const lista = document.getElementById('sorteadosList');
+            lista.innerHTML = sorteadosAtuais.map(n => `<span class="numero-tag">${n}</span>`).join('');
+        }
+
+        function mostrarStatus(elementId, mensagem, tipo) {
+            const elemento = document.getElementById(elementId);
+            elemento.innerHTML = `<div class="status ${tipo}">${mensagem}</div>`;
+        }
+
+        function getAnimalEmoji(numero) {
+            if (numero >= 1 && numero <= 10) return '🐶';
+            if (numero >= 11 && numero <= 20) return '🐱';
+            if (numero >= 21 && numero <= 30) return '🐭';
+            if (numero >= 31 && numero <= 40) return '🐹';
+            if (numero >= 41 && numero <= 50) return '🐸';
+            if (numero >= 51 && numero <= 60) return '🐟';
+            if (numero >= 61 && numero <= 70) return '🐢';
+            if (numero >= 71 && numero <= 80) return '🐵';
+            if (numero >= 81 && numero <= 90) return '🦉';
+            return '🦁';
+        }
+
+        async function carregarCartelaProfessor() {
+            if (!codigoSalaAtual) return;
+
+            try {
+                const response = await fetch(`/api/bingo/sala/${codigoSalaAtual}`);
+                if (!response.ok) return;
+
+                const data = await response.json();
+                cartelaProfessor = data.cartelaProfessor;
+                gerarCartelaProfessor();
+            } catch (error) {
+                console.error('Erro ao carregar cartela:', error);
+            }
+        }
+
+        function gerarCartelaProfessor() {
+            const div = document.getElementById('cartelaProfessor');
+            div.innerHTML = '';
+
+            if (!cartelaProfessor || cartelaProfessor.length === 0) {
+                div.innerHTML = '<p style="color: #999; text-align: center;">Erro ao carregar cartela</p>';
+                return;
+            }
+
+            cartelaProfessor.sort((a, b) => a - b);
+
+            const colunas = [[], [], [], [], []];
+            cartelaProfessor.forEach((numero, index) => {
+                const colunaIndex = Math.floor(index / 5);
+                colunas[colunaIndex].push(numero);
+            });
+
+            colunas.forEach(colunaNumeros => {
+                const coluna = document.createElement('div');
+                coluna.className = 'coluna-professor';
+
+                colunaNumeros.forEach(numero => {
+                    const d = document.createElement('div');
+                    d.className = 'numero-professor';
+                    d.innerHTML = `<div class="animal-icon">${getAnimalEmoji(numero)}</div><div>${numero}</div>`;
+                    coluna.appendChild(d);
+                });
+
+                div.appendChild(coluna);
+            });
+        }
+
+        // Adicionar animação CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+                100% { transform: scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
