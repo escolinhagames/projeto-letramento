@@ -28,8 +28,8 @@ public class GameSelectionController {
         bingo.put("id", "1");
         bingo.put("nome", "Bingo");
         bingo.put("descricao", "Um clássico jogo de bingo para professores e alunos");
-        bingo.put("urlInicio", "/bingo/jogo");
-        bingo.put("rotas", "POST /api/bingo/sala/criar");
+        bingo.put("urlInicio", "/bingo/aluno");
+        bingo.put("rotas", "GET /bingo/aluno, GET /bingo/professor, POST /api/bingo/sala/criar");
         jogos.add(bingo);
         
         // Jogo 2: Embaralhar
@@ -78,7 +78,7 @@ public class GameSelectionController {
                 jogo.put("id", "1");
                 jogo.put("nome", "Bingo");
                 jogo.put("descricao", "Um clássico jogo de bingo para professores e alunos");
-                jogo.put("urlInicio", "/bingo/jogo");
+                jogo.put("urlInicio", "/bingo/aluno");
                 jogo.put("instrucoes", "1. Professor cria uma sala\n2. Alunos entram com o código\n3. Professor sorteia números\n4. Alunos marcam suas cartelas");
                 break;
             case "2":
