@@ -42,15 +42,24 @@ public class EmbaralharProfessorController {
             Model model) {
         
         try {
-            if (imagem.isEmpty()) {
+            if (imagem == null || imagem.isEmpty()) {
                 model.addAttribute("erro", "Por favor, selecione uma imagem");
                 List<Game> games = gameService.getAllActiveGames();
                 model.addAttribute("games", games);
+                model.addAttribute("imageMap", buildImageMap(games));
+                return "professor";
+            }
+
+            if (palavra == null || palavra.trim().isEmpty()) {
+                model.addAttribute("erro", "Por favor, digite uma palavra");
+                List<Game> games = gameService.getAllActiveGames();
+                model.addAttribute("games", games);
+                model.addAttribute("imageMap", buildImageMap(games));
                 return "professor";
             }
 
             byte[] imageBytes = imagem.getBytes();
-            Game game = gameService.createGame(palavra, imageBytes, imagem.getOriginalFilename(), dificuldade);
+            Game game = gameService.createGame(palavra.trim(), imageBytes, imagem.getOriginalFilename(), dificuldade);
             
             model.addAttribute("sucesso", "Jogo criado com sucesso!");
             List<Game> games = gameService.getAllActiveGames();
@@ -59,7 +68,17 @@ public class EmbaralharProfessorController {
             
             return "professor";
         } catch (IOException e) {
+            System.err.println("Erro IO ao criar jogo: " + e.getMessage());
+            e.printStackTrace();
             model.addAttribute("erro", "Erro ao processar a imagem: " + e.getMessage());
+            List<Game> games = gameService.getAllActiveGames();
+            model.addAttribute("games", games);
+            model.addAttribute("imageMap", buildImageMap(games));
+            return "professor";
+        } catch (Exception e) {
+            System.err.println("Erro ao criar jogo: " + e.getMessage());
+            e.printStackTrace();
+            model.addAttribute("erro", "Erro ao criar jogo: " + e.getMessage());
             List<Game> games = gameService.getAllActiveGames();
             model.addAttribute("games", games);
             model.addAttribute("imageMap", buildImageMap(games));

@@ -19,7 +19,7 @@ public class Game {
     @Column(nullable = false)
     private String word;
 
-    @Column(nullable = false, columnDefinition = "LONGBLOB")
+    @Column(nullable = false, columnDefinition = "bytea")
     private byte[] image;
 
     @Column(nullable = false)
