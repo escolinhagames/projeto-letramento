@@ -122,7 +122,7 @@ public class BingoSalaController {
         Map<String, Object> response = new HashMap<>();
         response.put("mensagem", "Aluno entrou na sala com sucesso!");
         response.put("nome", nome);
-        response.put("cartela", sala.gerarCartela());
+        response.put("cartela", sala.getCartelaAluno(nome));
         response.put("codigo", codigo);
         
         return ResponseEntity.ok(response);
@@ -150,6 +150,33 @@ public class BingoSalaController {
         
         Map<String, String> response = new HashMap<>();
         response.put("status", "Número marcado");
+        response.put("numero", String.valueOf(numero));
+        
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Aluno desmarca um número
+     * POST /api/bingo/sala/{codigo}/aluno/{nome}/desmarcar?numero=23
+     */
+    @PostMapping("/{codigo}/aluno/{nome}/desmarcar")
+    public ResponseEntity<Map<String, String>> desmarcarNumero(
+        @PathVariable String codigo,
+        @PathVariable String nome,
+        @RequestParam int numero) {
+        
+        SalaJogo sala = bingoService.obterSala(codigo);
+        
+        if (sala == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                Map.of("erro", "Sala não encontrada")
+            );
+        }
+
+        sala.desmarcarNumero(nome, numero);
+        
+        Map<String, String> response = new HashMap<>();
+        response.put("status", "Número desmarcado");
         response.put("numero", String.valueOf(numero));
         
         return ResponseEntity.ok(response);

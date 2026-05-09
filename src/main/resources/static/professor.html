@@ -473,9 +473,10 @@
                 } else {
                     let html = '';
                     data.alunos.forEach(aluno => {
+                        const alunoId = sanitizeId(aluno);
                         html += `<div class="aluno-item">
                             <span>${aluno}</span>
-                            <span id="bingo-${aluno}">Jogando...</span>
+                            <span id="bingo-${alunoId}">Jogando...</span>
                         </div>`;
                     });
                     listaAlunos.innerHTML = html;
@@ -488,15 +489,19 @@
             }
         }
 
+        function sanitizeId(text) {
+            return String(text).replace(/[^a-zA-Z0-9_-]/g, '_');
+        }
+
         async function verificarBingoAluno(nome) {
             if (!codigoSalaAtual) return;
 
             try {
-                const response = await fetch(`/api/bingo/sala/${codigoSalaAtual}/aluno/${nome}/bingo`);
+                const response = await fetch(`/api/bingo/sala/${codigoSalaAtual}/aluno/${encodeURIComponent(nome)}/bingo`);
                 if (!response.ok) return;
 
                 const data = await response.json();
-                const elemento = document.getElementById(`bingo-${nome}`);
+                const elemento = document.getElementById(`bingo-${sanitizeId(nome)}`);
                 
                 if (elemento) {
                     if (data.bingo) {

@@ -323,7 +323,7 @@
 
             <div class="progress">
                 <div class="progress-label">
-                    Seu progresso: <strong><span id="progressoText">0</span>/9</strong>
+                    Seu progresso: <strong><span id="progressoText">0</span>/<span id="progressoTotal">25</span></strong>
                 </div>
                 <div class="progress-bar">
                     <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
@@ -355,6 +355,15 @@
         let numerosMarcados = new Set();
         let ultimoNumeroSorteado = null;
         let ganhou = false;
+
+        function falarNumero(numero) {
+            const msg = new SpeechSynthesisUtterance(`Número ${numero}`);
+            msg.lang = 'pt-BR';
+            msg.rate = 0.9;
+            msg.pitch = 1.1;
+            window.speechSynthesis.cancel(); // evita sobreposição
+            window.speechSynthesis.speak(msg);
+        }
 
         async function entrarSala() {
             const codigo = document.getElementById('codigoSala').value.trim();
@@ -475,7 +484,7 @@
             try {
                 const endpoint = jaEstaMarc ? 'desmarcar' : 'marcar';
                 await fetch(
-                    `/api/bingo/sala/${codigoSalaAtual}/aluno/${meuNome}/${endpoint}?numero=${numero}`,
+                    `/api/bingo/sala/${codigoSalaAtual}/aluno/${encodeURIComponent(meuNome)}/${endpoint}?numero=${numero}`,
                     { method: 'POST' }
                 );
             } catch (error) {
@@ -525,10 +534,11 @@
                 if (data.sorteados && data.sorteados.length > 0) {
                     const ultimoSorteado = data.sorteados[data.sorteados.length - 1];
                     if (ultimoSorteado !== ultimoNumeroSorteado) {
-                        ultimoNumeroSorteado = ultimoSorteado;
-                        document.getElementById('numeroDisplay').textContent = ultimoSorteado;
-                        tocarBeep();
-                    }
+                            ultimoNumeroSorteado = ultimoSorteado;
+                            document.getElementById('numeroDisplay').textContent = ultimoSorteado;
+
+                            falarNumero(ultimoSorteado); // 🔊 FALA O NÚMERO
+                        }
                 } else {
                     // Reset se não há números sorteados
                     if (ultimoNumeroSorteado !== null) {
@@ -542,12 +552,13 @@
         }
 
         async function verificarVitoria() {
-            if (numerosMarcados.size === 9 && !ganhou) {
+            const total = minhaCartela.length || 25;
+            if (numerosMarcados.size === total && total > 0 && !ganhou) {
                 ganhou = true;
 
                 try {
                     const response = await fetch(
-                        `/api/bingo/sala/${codigoSalaAtual}/aluno/${meuNome}/bingo`
+                        `/api/bingo/sala/${codigoSalaAtual}/aluno/${encodeURIComponent(meuNome)}/bingo`
                     );
                     const data = await response.json();
                     
@@ -563,10 +574,11 @@
         }
 
         function atualizarProgresso() {
-            const total = 9;
+            const total = minhaCartela.length || 25;
             const marcados = numerosMarcados.size;
-            const percentual = (marcados / total) * 100;
+            const percentual = total === 0 ? 0 : (marcados / total) * 100;
             document.getElementById('progressoText').textContent = marcados;
+            document.getElementById('progressoTotal').textContent = total;
             document.getElementById('progressFill').style.width = percentual + '%';
             document.getElementById('progressFill').textContent = Math.round(percentual) + '%';
         }
