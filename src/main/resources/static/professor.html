@@ -30,13 +30,6 @@
             width: 100%;
         }
 
-        h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 10px;
-            font-size: 32px;
-        }
-
         .subtitle {
             text-align: center;
             color: #666;
@@ -252,11 +245,28 @@
             font-size: 24px;
             margin-bottom: 2px;
         }
+
+        .btn-voltar {
+            background-color: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-voltar:hover {
+            background-color: #764ba2;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🎲 Bingo do Professor</h1>
+        <a href="http://localhost:4200/dashboard" class="btn-voltar">← Voltar</a>
         <p class="subtitle">Crie uma sala e comece a sortear!</p>
 
         <!-- Seção: Criar Sala -->

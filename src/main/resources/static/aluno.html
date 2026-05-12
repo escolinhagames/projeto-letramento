@@ -290,12 +290,51 @@
         .overlay.show {
             display: block;
         }
+
+        .btn-voltar {
+            background-color: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-voltar:hover {
+            background-color: #764ba2;
+        }
+
+        .btn-audio {
+            background-color: #f5576c;
+            color: white;
+            width: 10%;
+            margin-top: 12px;
+            margin-bottom: 15px;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-audio:hover {
+            background-color: #d63854;
+            transform: scale(1.02);
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎲 Bingo Infantil</h1>
-        <p class="subtitle">Bem-vindo ao jogo!</p>
+        <a href="http://localhost:4200/aluno-dashboard" class="btn-voltar">← Voltar</a>
+        <h1>🎲 Bingo Infantil
+            <button class="btn-audio" onclick="falarInstrucao()">🔊 </button>
+        </h1> 
+        <p class="subtitle">Vamos aprender os números!</p>
 
         <!-- Seção: Entrar na Sala -->
         <div class="section" id="secaoEntrar">
@@ -620,6 +659,19 @@
         window.onload = () => {
             document.getElementById('meuNome').focus();
         };
+        
+        function falarInstrucao() {
+            const msg = new SpeechSynthesisUtterance(
+                'Clique no botão azul para voltar para a tela de jogos'
+            );
+
+            msg.lang = 'pt-BR';
+            msg.rate = 0.9;
+            msg.pitch = 1.1;
+
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(msg);
+        }
     </script>
 </body>
 </html>

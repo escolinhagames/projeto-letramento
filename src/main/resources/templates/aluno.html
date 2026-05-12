@@ -120,12 +120,33 @@
             margin-bottom: 20px;
             font-size: 1.8rem;
         }
+        .btn-audio {
+            background-color: #4CAF50;
+            color: white;
+            width: 5%;
+            margin-top: 12px;
+            margin-bottom: 15px;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-audio:hover {
+            background-color: #d63854;
+            transform: scale(1.02);
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>👨‍🎓 Escolha um Jogo</h1>
+            <button class="btn-audio" onclick="falarInstrucao()">🔊 </button>
+            </h1> 
             <a href="http://localhost:4200/aluno-dashboard" class="btn-voltar">← Voltar</a>
         </div>
         
@@ -146,4 +167,18 @@
         </div>
     </div>
 </body>
+<script>
+    function falarInstrucao() {
+            const msg = new SpeechSynthesisUtterance(
+                'Clique no botão azul para voltar para a tela de jogos'
+            );
+
+            msg.lang = 'pt-BR';
+            msg.rate = 0.9;
+            msg.pitch = 1.1;
+
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(msg);
+        }
+</script>
 </html>
