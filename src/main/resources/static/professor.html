@@ -30,13 +30,6 @@
             width: 100%;
         }
 
-        h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 10px;
-            font-size: 32px;
-        }
-
         .subtitle {
             text-align: center;
             color: #666;
@@ -252,11 +245,28 @@
             font-size: 24px;
             margin-bottom: 2px;
         }
+
+        .btn-voltar {
+            background-color: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-voltar:hover {
+            background-color: #764ba2;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🎲 Bingo do Professor</h1>
+        <a href="http://localhost:4200/dashboard" class="btn-voltar">← Voltar</a>
         <p class="subtitle">Crie uma sala e comece a sortear!</p>
 
         <!-- Seção: Criar Sala -->
@@ -473,9 +483,10 @@
                 } else {
                     let html = '';
                     data.alunos.forEach(aluno => {
+                        const alunoId = sanitizeId(aluno);
                         html += `<div class="aluno-item">
                             <span>${aluno}</span>
-                            <span id="bingo-${aluno}">Jogando...</span>
+                            <span id="bingo-${alunoId}">Jogando...</span>
                         </div>`;
                     });
                     listaAlunos.innerHTML = html;
@@ -488,15 +499,19 @@
             }
         }
 
+        function sanitizeId(text) {
+            return String(text).replace(/[^a-zA-Z0-9_-]/g, '_');
+        }
+
         async function verificarBingoAluno(nome) {
             if (!codigoSalaAtual) return;
 
             try {
-                const response = await fetch(`/api/bingo/sala/${codigoSalaAtual}/aluno/${nome}/bingo`);
+                const response = await fetch(`/api/bingo/sala/${codigoSalaAtual}/aluno/${encodeURIComponent(nome)}/bingo`);
                 if (!response.ok) return;
 
                 const data = await response.json();
-                const elemento = document.getElementById(`bingo-${nome}`);
+                const elemento = document.getElementById(`bingo-${sanitizeId(nome)}`);
                 
                 if (elemento) {
                     if (data.bingo) {

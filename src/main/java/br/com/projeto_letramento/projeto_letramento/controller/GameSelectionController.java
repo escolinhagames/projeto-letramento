@@ -83,10 +83,10 @@ public class GameSelectionController {
                 break;
             case "2":
                 jogo.put("id", "2");
-                jogo.put("nome", "Embaralhar");
-                jogo.put("descricao", "Adivinhe a palavra pela imagem");
-                jogo.put("urlInicio", "/embaralhar");
-                jogo.put("instrucoes", "1. Professor cria jogos com palavras e imagens\n2. Alunos selecionam um jogo\n3. Formam a palavra com as letras embaralhadas\n4. Tentam acertar a palavra correta");
+                jogo.put("nome", "Jogo 2");
+                jogo.put("descricao", "Descrição do segundo jogo");
+                jogo.put("urlInicio", "/jogo2");
+                jogo.put("status", "Em desenvolvimento");
                 break;
             case "3":
                 jogo.put("id", "3");
