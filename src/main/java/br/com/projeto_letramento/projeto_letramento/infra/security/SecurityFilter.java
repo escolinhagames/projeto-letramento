@@ -43,6 +43,7 @@ public class SecurityFilter extends OncePerRequestFilter {
             requestURI.startsWith("/bingo/") ||
             requestURI.startsWith("/embaralhar") ||
             requestURI.endsWith(".html") ||
+            requestURI.startsWith("/jogo-imagem/") ||
             requestURI.equals("/error")) {
             filterChain.doFilter(request, response);
             return;
