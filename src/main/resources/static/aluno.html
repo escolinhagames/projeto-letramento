@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bingo Infantil - Aluno</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #f5576c;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: #f5576c;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #d63854;
+            transform: translateY(-2px);
+        }
+
+        .numero-sorteado {
+            font-size: 56px;
+            font-weight: bold;
+            color: #f5576c;
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: #ffe6eb;
+            border-radius: 10px;
+            border: 3px solid #f5576c;
+        }
+
+        .cartela {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .coluna {
+            display: grid;
+            gap: 10px;
+            width: 72px;
+        }
+
+        .animal-icon {
+            font-size: 24px;
+            margin-bottom: 6px;
+        }
+
+        .numero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            user-select: none;
+            padding: 12px 8px;
+            min-height: 90px;
+        }
+
+        .numero:hover:not(.nao-sorteado) {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .numero.nao-sorteado {
+            background: #f0f0f0;
+            color: #999;
+            cursor: not-allowed;
+            border-color: #ccc;
+        }
+
+        .numero.sorteado-nao-marcado {
+            border: 3px solid #FF5722;
+            background: #FFF3E0;
+            animation: piscada 0.5s ease-in-out;
+        }
+
+        .numero.marcado {
+            background: #90ee90;
+            border-color: #45a049;
+            font-weight: bold;
+        }
+
+        .numero.marcado.sorteado-nao-marcado {
+            animation: none;
+            border: 3px solid #45a049;
+        }
+
+        @keyframes piscada {
+            0%, 100% { 
+                background: #FFF3E0;
+                border-color: #FF5722;
+            }
+            50% { 
+                background: #FF5722;
+                border-color: #FF5722;
+                color: white;
+            }
+        }
+
+        .status {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .status.success {
+            background: #c8e6c9;
+            color: #2e7d32;
+        }
+
+        .status.error {
+            background: #ffcdd2;
+            color: #c62828;
+        }
+
+        .progress {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .progress-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 25px;
+            background: #ddd;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f093fb, #f5576c);
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .info-box {
+            background: #f0f4ff;
+            border-left: 4px solid #f5576c;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .info-box.show {
+            display: block;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #vitoria {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            z-index: 1000;
+        }
+
+        #vitoria h2 {
+            color: #4CAF50;
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        #vitoria p {
+            font-size: 18px;
+            color: #666;
+            margin: 10px 0;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        .btn-voltar {
+            background-color: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-voltar:hover {
+            background-color: #764ba2;
+        }
+
+        .btn-audio {
+            background-color: #f5576c;
+            color: white;
+            width: 10%;
+            margin-top: 12px;
+            margin-bottom: 15px;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-audio:hover {
+            background-color: #d63854;
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="http://localhost:4200/aluno-dashboard" class="btn-voltar">← Voltar</a>
+        <h1>🎲 Bingo Infantil
+            <button class="btn-audio" onclick="falarInstrucao()">🔊 </button>
+        </h1> 
+        <p class="subtitle">Vamos aprender os números!</p>
+
+        <!-- Seção: Entrar na Sala -->
+        <div class="section" id="secaoEntrar">
+            <h2 style="margin-bottom: 15px;">Entrar na Sala</h2>
+            <div class="form-group">
+                <label for="codigoSala">Código da sala:</label>
+                <input type="text" id="codigoSala" placeholder="Digite o código da sala" maxlength="4">
+            </div>
+            <div class="form-group">
+                <label for="meuNome">Seu nome:</label>
+                <input type="text" id="meuNome" placeholder="Digite seu nome">
+            </div>
+            <button class="btn-primary" onclick="entrarSala()" style="width: 100%;">Entrar na Sala</button>
+            <div id="statusEntrada"></div>
+        </div>
+
+        <!-- Seção: Jogo -->
+        <div class="section hidden" id="secaoJogo">
+            <div class="info-box" id="infoBox">
+                <strong>Você está na sala: <span id="salaInfo"></span></strong>
+            </div>
+
+            <h2 style="text-align: center; margin-bottom: 10px;">Número do Prof:</h2>
+            <div class="numero-sorteado" id="numeroDisplay">-</div>
+
+            <div class="progress">
+                <div class="progress-label">
+                    Seu progresso: <strong><span id="progressoText">0</span>/<span id="progressoTotal">25</span></strong>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+                </div>
+            </div>
+
+            <h2 style="text-align: center; margin-bottom: 15px;">Sua Cartela</h2>
+            <p style="text-align: center; color: #666; font-size: 12px; margin-bottom: 10px;">Clique nos números para marcar/desmarcar</p>
+
+            <div class="cartela" id="cartela"></div>
+
+            <button class="btn-primary" onclick="sairSala()" style="width: 100%; margin-top: 20px;">Sair da Sala</button>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+    <div id="vitoria">
+        <h2>🎉 Parabéns!</h2>
+        <p>Você fez BINGO!</p>
+        <button class="btn-primary" onclick="location.reload()" style="margin-top: 20px;">Jogar Novamente</button>
+    </div>
+
+    <script>
+        // Variáveis globais
+        let codigoSalaAtual = null;
+        let meuNome = null;
+        let minhaCartela = [];
+        let numerosSorteados = new Set();
+        let numerosMarcados = new Set();
+        let ultimoNumeroSorteado = null;
+        let ganhou = false;
+
+        function falarNumero(numero) {
+            const msg = new SpeechSynthesisUtterance(`Número ${numero}`);
+            msg.lang = 'pt-BR';
+            msg.rate = 0.9;
+            msg.pitch = 1.1;
+            window.speechSynthesis.cancel(); // evita sobreposição
+            window.speechSynthesis.speak(msg);
+        }
+
+        async function entrarSala() {
+            const codigo = document.getElementById('codigoSala').value.trim();
+            const nome = document.getElementById('meuNome').value.trim();
+
+            if (!codigo || !nome) {
+                mostrarStatus('statusEntrada', 'Por favor, digite o código da sala e seu nome', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/bingo/sala/${codigo}/aluno/entrar?nome=${encodeURIComponent(nome)}`, {
+                    method: 'POST'
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    mostrarStatus('statusEntrada', error.erro || 'Erro ao entrar na sala', 'error');
+                    return;
+                }
+
+                const data = await response.json();
+                codigoSalaAtual = codigo;
+                meuNome = nome;
+                minhaCartela = data.cartela;
+
+                document.getElementById('secaoEntrar').classList.add('hidden');
+                document.getElementById('secaoJogo').classList.remove('hidden');
+                document.getElementById('salaInfo').textContent = codigo;
+
+                gerarCartela();
+                atualizarProgresso();
+
+                // Iniciar monitoramento
+                monitorarSala();
+                setInterval(monitorarSala, 2000);
+
+                mostrarStatus('statusEntrada', `Bem-vindo, ${nome}!`, 'success');
+            } catch (error) {
+                mostrarStatus('statusEntrada', 'Erro ao conectar com o servidor', 'error');
+            }
+        }
+
+        function getAnimalEmoji(numero) {
+            if (numero >= 1 && numero <= 10) return '🐶';
+            if (numero >= 11 && numero <= 20) return '🐱';
+            if (numero >= 21 && numero <= 30) return '🦆';
+            if (numero >= 31 && numero <= 40) return '🐰';
+            if (numero >= 41 && numero <= 50) return '🐸';
+            if (numero >= 51 && numero <= 60) return '🐟';
+            if (numero >= 61 && numero <= 70) return '🐢';
+            if (numero >= 71 && numero <= 80) return '🐵';
+            if (numero >= 81 && numero <= 90) return '🦉';
+            return '🦁';
+        }
+
+        function gerarCartela() {
+            const div = document.getElementById('cartela');
+            div.innerHTML = '';
+
+            minhaCartela.sort((a, b) => a - b);
+
+            const colunas = [[], [], [], [], []];
+            minhaCartela.forEach((numero, index) => {
+                const colunaIndex = Math.floor(index / 5);
+                colunas[colunaIndex].push(numero);
+            });
+
+            colunas.forEach(colunaNumeros => {
+                const coluna = document.createElement('div');
+                coluna.className = 'coluna';
+
+                colunaNumeros.forEach(numero => {
+                    const d = document.createElement('div');
+                    d.className = 'numero nao-sorteado';
+                    d.id = 'n' + numero;
+                    d.innerHTML = `<div class="animal-icon">${getAnimalEmoji(numero)}</div><div>${numero}</div>`;
+                    d.onclick = () => marcarNumeroPronta(numero);
+                    coluna.appendChild(d);
+                });
+
+                div.appendChild(coluna);
+            });
+
+            atualizarProgresso();
+        }
+
+        function marcarNumeroPronta(numero) {
+            // Só permite marcar se foi sorteado
+            if (!numerosSorteados.has(numero)) {
+                return;
+            }
+
+            marcarNumero(numero);
+        }
+
+        async function marcarNumero(numero) {
+            if (ganhou) return;
+
+            const elemento = document.getElementById('n' + numero);
+            if (!elemento) return;
+
+            const jaEstaMarc = numerosMarcados.has(numero);
+
+            if (jaEstaMarc) {
+                // Desmarcar
+                numerosMarcados.delete(numero);
+                elemento.classList.remove('marcado');
+                elemento.classList.add('sorteado-nao-marcado');
+            } else {
+                // Marcar
+                numerosMarcados.add(numero);
+                elemento.classList.add('marcado');
+                elemento.classList.remove('sorteado-nao-marcado');
+            }
+
+            // Enviar para servidor
+            try {
+                const endpoint = jaEstaMarc ? 'desmarcar' : 'marcar';
+                await fetch(
+                    `/api/bingo/sala/${codigoSalaAtual}/aluno/${encodeURIComponent(meuNome)}/${endpoint}?numero=${numero}`,
+                    { method: 'POST' }
+                );
+            } catch (error) {
+                console.error('Erro ao marcar:', error);
+            }
+
+            atualizarProgresso();
+            verificarVitoria();
+        }
+
+        async function monitorarSala() {
+            if (!codigoSalaAtual) return;
+
+            try {
+                const response = await fetch(`/api/bingo/sala/${codigoSalaAtual}`);
+                if (!response.ok) return;
+
+                const data = await response.json();
+                const sorteados = new Set(data.sorteados);
+
+                // Atualizar todos os números
+                minhaCartela.forEach(numero => {
+                    const elemento = document.getElementById('n' + numero);
+                    if (!elemento) return;
+
+                    const foiSorteado = sorteados.has(numero);
+                    const estaMarcado = numerosMarcados.has(numero);
+
+                    if (foiSorteado) {
+                        numerosSorteados.add(numero);
+                        elemento.classList.remove('nao-sorteado');
+
+                        if (!estaMarcado) {
+                            elemento.classList.add('sorteado-nao-marcado');
+                        } else {
+                            elemento.classList.add('marcado');
+                            elemento.classList.remove('sorteado-nao-marcado');
+                        }
+                    } else {
+                        numerosSorteados.delete(numero);
+                        elemento.classList.add('nao-sorteado');
+                        elemento.classList.remove('sorteado-nao-marcado', 'marcado');
+                    }
+                });
+
+                // Atualizar número display
+                if (data.sorteados && data.sorteados.length > 0) {
+                    const ultimoSorteado = data.sorteados[data.sorteados.length - 1];
+                    if (ultimoSorteado !== ultimoNumeroSorteado) {
+                            ultimoNumeroSorteado = ultimoSorteado;
+                            document.getElementById('numeroDisplay').textContent = ultimoSorteado;
+
+                            falarNumero(ultimoSorteado); // 🔊 FALA O NÚMERO
+                        }
+                } else {
+                    // Reset se não há números sorteados
+                    if (ultimoNumeroSorteado !== null) {
+                        ultimoNumeroSorteado = null;
+                        document.getElementById('numeroDisplay').textContent = '-';
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao monitorar:', error);
+            }
+        }
+
+        async function verificarVitoria() {
+            const total = minhaCartela.length || 25;
+            if (numerosMarcados.size === total && total > 0 && !ganhou) {
+                ganhou = true;
+
+                try {
+                    const response = await fetch(
+                        `/api/bingo/sala/${codigoSalaAtual}/aluno/${encodeURIComponent(meuNome)}/bingo`
+                    );
+                    const data = await response.json();
+                    
+                    if (data.bingo) {
+                        document.getElementById('overlay').classList.add('show');
+                        document.getElementById('vitoria').style.display = 'block';
+                        tocarBeep();
+                    }
+                } catch (error) {
+                    console.error('Erro ao verificar vitória:', error);
+                }
+            }
+        }
+
+        function atualizarProgresso() {
+            const total = minhaCartela.length || 25;
+            const marcados = numerosMarcados.size;
+            const percentual = total === 0 ? 0 : (marcados / total) * 100;
+            document.getElementById('progressoText').textContent = marcados;
+            document.getElementById('progressoTotal').textContent = total;
+            document.getElementById('progressFill').style.width = percentual + '%';
+            document.getElementById('progressFill').textContent = Math.round(percentual) + '%';
+        }
+
+        function sairSala() {
+            if (confirm('Deseja sair da sala?')) {
+                location.reload();
+            }
+        }
+
+        function mostrarStatus(elementId, mensagem, tipo) {
+            const elemento = document.getElementById(elementId);
+            elemento.innerHTML = `<div class="status ${tipo}">${mensagem}</div>`;
+        }
+
+        function tocarBeep() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.2);
+            } catch (e) {
+                // Som não disponível
+            }
+        }
+
+        // Auto focus no primeiro input
+        window.onload = () => {
+            document.getElementById('meuNome').focus();
+        };
+        
+        function falarInstrucao() {
+            const msg = new SpeechSynthesisUtterance(
+                'Clique no botão azul para voltar para a tela de jogos'
+            );
+
+            msg.lang = 'pt-BR';
+            msg.rate = 0.9;
+            msg.pitch = 1.1;
+
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(msg);
+        }
+    </script>
+</body>
+</html>

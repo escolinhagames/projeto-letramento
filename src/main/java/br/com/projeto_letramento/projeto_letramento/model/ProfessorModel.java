@@ -2,7 +2,6 @@ package br.com.projeto_letramento.projeto_letramento.model;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
 
