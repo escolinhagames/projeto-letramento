@@ -11,17 +11,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 @Data
 @Entity
-@Table(name="professores",schema="turma")
+@Table(name="professores") 
 public class ProfessorModel implements Serializable{
     
     @Id
-    @GeneratedValue(generator = "turma.professores_seq",strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name="turma.professores_seq", sequenceName = "turma.professores_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // 🔥 trocado para IDENTITY
     @Column(name="id")
     private Integer id;
     @Column(name="nome")
