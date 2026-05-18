@@ -28,7 +28,6 @@ public class SecurityFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        // Skip JWT validation for public endpoints
         String requestURI = request.getRequestURI();
         String method = request.getMethod();
         if ("OPTIONS".equalsIgnoreCase(method) ||
@@ -41,7 +40,8 @@ public class SecurityFilter extends OncePerRequestFilter {
             requestURI.startsWith("/api/bingo/") ||
             requestURI.startsWith("/api/jogos/") ||
             requestURI.startsWith("/bingo/") ||
-            requestURI.startsWith("/embaralhar") ||
+            requestURI.startsWith("/embaralhar/") ||
+            requestURI.equals("/embaralhar") ||
             requestURI.endsWith(".html") ||
             requestURI.startsWith("/jogo-imagem/") ||
             requestURI.equals("/error")) {
@@ -64,9 +64,7 @@ public class SecurityFilter extends OncePerRequestFilter {
 
     private String recoverToken(HttpServletRequest request) {
         var authHeader = request.getHeader("Authorization");
-
         if (authHeader == null || !authHeader.startsWith("Bearer ")) return null;
-
-        return authHeader.substring(7); 
+        return authHeader.substring(7);
     }
 }

@@ -343,6 +343,7 @@
         let alunosConectados = {};
         let cartelaProfessor = [];
 
+        // ✅ ALTERADO: adicionado Content-Type e body no fetch para evitar bloqueio do Railway Edge
         async function criarSala() {
             const nome = document.getElementById('nomeProfessor').value.trim();
             
@@ -353,7 +354,9 @@
 
             try {
                 const response = await fetch(`/api/bingo/sala/criar?professor=${encodeURIComponent(nome)}`, {
-                    method: 'POST'
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }, // ✅ NOVO
+                    body: JSON.stringify({})                          // ✅ NOVO
                 });
 
                 if (!response.ok) throw new Error('Erro ao criar sala');
@@ -365,10 +368,8 @@
                 document.getElementById('secaoCriar').classList.add('hidden');
                 document.getElementById('secaoSala').classList.remove('hidden');
 
-                // Carregar cartela do professor
                 await carregarCartelaProfessor();
 
-                // Inicia monitoramento da sala
                 monitorarSala();
                 setInterval(monitorarSala, 2000);
 

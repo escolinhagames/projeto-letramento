@@ -4,26 +4,16 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import java.util.*;
 
-/**
- * Controller para seleção de jogos na tela inicial.
- * Permite que o professor/aluno escolha qual jogo jogar.
- */
 @RestController
 @RequestMapping("/api/jogos")
-@CrossOrigin
 public class GameSelectionController {
 
-    /**
-     * Retorna a lista de todos os jogos disponíveis
-     * GET /api/jogos/listar
-     */
     @GetMapping("/listar")
     public ResponseEntity<Map<String, Object>> listarJogos() {
         Map<String, Object> response = new HashMap<>();
         
         List<Map<String, String>> jogos = new ArrayList<>();
         
-        // Jogo 1: Bingo
         Map<String, String> bingo = new HashMap<>();
         bingo.put("id", "1");
         bingo.put("nome", "Bingo");
@@ -32,7 +22,6 @@ public class GameSelectionController {
         bingo.put("rotas", "GET /bingo/aluno, GET /bingo/professor, POST /api/bingo/sala/criar");
         jogos.add(bingo);
         
-        // Jogo 2: Embaralhar
         Map<String, String> jogo2 = new HashMap<>();
         jogo2.put("id", "2");
         jogo2.put("nome", "Embaralhar");
@@ -41,7 +30,6 @@ public class GameSelectionController {
         jogo2.put("rotas", "GET /embaralhar/**, POST /embaralhar/**");
         jogos.add(jogo2);
         
-        // Jogo 3: [Próximo Jogo]
         Map<String, String> jogo3 = new HashMap<>();
         jogo3.put("id", "3");
         jogo3.put("nome", "Jogo 3");
@@ -50,7 +38,6 @@ public class GameSelectionController {
         jogo3.put("rotas", "Em desenvolvimento");
         jogos.add(jogo3);
         
-        // Jogo 4: [Próximo Jogo]
         Map<String, String> jogo4 = new HashMap<>();
         jogo4.put("id", "4");
         jogo4.put("nome", "Jogo 4");
@@ -65,10 +52,6 @@ public class GameSelectionController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Retorna detalhes de um jogo específico
-     * GET /api/jogos/{idJogo}
-     */
     @GetMapping("/{idJogo}")
     public ResponseEntity<Map<String, String>> obterDetalhesJogo(@PathVariable String idJogo) {
         Map<String, String> jogo = new HashMap<>();

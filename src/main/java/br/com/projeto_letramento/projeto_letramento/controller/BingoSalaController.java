@@ -7,12 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import java.util.*;
 
-/**
- * Controller para gerenciar salas de jogo do Bingo - professor e alunos.
- */
 @RestController
 @RequestMapping("/api/bingo/sala")
-@CrossOrigin
 public class BingoSalaController {
 
     private final BingoService bingoService;
@@ -21,10 +17,6 @@ public class BingoSalaController {
         this.bingoService = bingoService;
     }
 
-    /**
-     * Professor cria uma nova sala
-     * POST /api/bingo/sala/criar?professor=João
-     */
     @PostMapping("/criar")
     public ResponseEntity<Map<String, String>> criarSala(@RequestParam String professor) {
         try {
@@ -41,10 +33,6 @@ public class BingoSalaController {
         }
     }
 
-    /**
-     * Obtém informações de uma sala
-     * GET /api/bingo/sala/{codigo}
-     */
     @GetMapping("/{codigo}")
     public ResponseEntity<Map<String, Object>> obterSala(@PathVariable String codigo) {
         SalaJogo sala = bingoService.obterSala(codigo);
@@ -70,10 +58,6 @@ public class BingoSalaController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Professor sorteia um número
-     * POST /api/bingo/sala/{codigo}/sortear
-     */
     @PostMapping("/{codigo}/sortear")
     public ResponseEntity<Map<String, Object>> sortear(@PathVariable String codigo) {
         SalaJogo sala = bingoService.obterSala(codigo);
@@ -100,10 +84,6 @@ public class BingoSalaController {
         }
     }
 
-    /**
-     * Aluno entra na sala
-     * POST /api/bingo/sala/{codigo}/aluno/entrar?nome=Pedro
-     */
     @PostMapping("/{codigo}/aluno/entrar")
     public ResponseEntity<Map<String, Object>> entrarSala(
         @PathVariable String codigo,
@@ -128,10 +108,6 @@ public class BingoSalaController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Aluno marca um número
-     * POST /api/bingo/sala/{codigo}/aluno/{nome}/marcar?numero=23
-     */
     @PostMapping("/{codigo}/aluno/{nome}/marcar")
     public ResponseEntity<Map<String, String>> marcarNumero(
         @PathVariable String codigo,
@@ -155,10 +131,6 @@ public class BingoSalaController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Aluno desmarca um número
-     * POST /api/bingo/sala/{codigo}/aluno/{nome}/desmarcar?numero=23
-     */
     @PostMapping("/{codigo}/aluno/{nome}/desmarcar")
     public ResponseEntity<Map<String, String>> desmarcarNumero(
         @PathVariable String codigo,
@@ -182,10 +154,6 @@ public class BingoSalaController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Aluno verifica seu bingo
-     * GET /api/bingo/sala/{codigo}/aluno/{nome}/bingo
-     */
     @GetMapping("/{codigo}/aluno/{nome}/bingo")
     public ResponseEntity<Map<String, Object>> verificarBingo(
         @PathVariable String codigo,
@@ -210,10 +178,6 @@ public class BingoSalaController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Reseta a sala para novo jogo
-     * POST /api/bingo/sala/{codigo}/reset
-     */
     @PostMapping("/{codigo}/reset")
     public ResponseEntity<Map<String, String>> resetarSala(@PathVariable String codigo) {
         SalaJogo sala = bingoService.obterSala(codigo);
@@ -233,10 +197,6 @@ public class BingoSalaController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Encerra a sala
-     * POST /api/bingo/sala/{codigo}/encerrar
-     */
     @PostMapping("/{codigo}/encerrar")
     public ResponseEntity<Map<String, String>> encerrarSala(@PathVariable String codigo) {
         bingoService.encerrarSala(codigo);
