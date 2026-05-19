@@ -28,7 +28,7 @@ public class EmbaralharAlunoController {
         return "aluno";
     }
 
-    // ✅ NOVO: endpoint JSON para o fetch do aluno.html
+    // ✅ NOVO: lista jogos em JSON para o Angular
     @GetMapping("/jogos")
     @ResponseBody
     public ResponseEntity<List<Map<String, Object>>> listarJogos() {
@@ -45,16 +45,28 @@ public class EmbaralharAlunoController {
     @GetMapping("/jogo/{id}")
     public String jogoPage(@PathVariable Long id, Model model) {
         Game game = gameService.getGameById(id).orElse(null);
-
         if (game == null) {
             model.addAttribute("erro", "Jogo não encontrado!");
             return "redirect:/embaralhar/aluno";
         }
-
         String imageBase64 = Base64.getEncoder().encodeToString(game.getImage());
         model.addAttribute("game", game);
         model.addAttribute("imageBase64", imageBase64);
         return "jogo";
+    }
+
+    // ✅ NOVO: retorna jogo em JSON para o Angular
+    @GetMapping("/jogo-json/{id}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> jogoJson(@PathVariable Long id) {
+        Game game = gameService.getGameById(id).orElse(null);
+        if (game == null) return ResponseEntity.notFound().build();
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", game.getId());
+        map.put("word", game.getWord());
+        map.put("difficulty", game.getDifficulty() != null ? game.getDifficulty().name() : "EASY");
+        map.put("imagemBase64", Base64.getEncoder().encodeToString(game.getImage()));
+        return ResponseEntity.ok(map);
     }
 
     @PostMapping("/enviar-resposta")
@@ -62,16 +74,13 @@ public class EmbaralharAlunoController {
             @RequestParam("gameId") Long gameId,
             @RequestParam("resposta") String resposta,
             Model model) {
-
         try {
             GameAttempt attempt = gameService.saveAttempt(gameId, resposta);
             Game game = gameService.getGameById(gameId).get();
             String imageBase64 = Base64.getEncoder().encodeToString(game.getImage());
-
             model.addAttribute("game", game);
             model.addAttribute("imageBase64", imageBase64);
             model.addAttribute("attempt", attempt);
-
             if (attempt.getCorrect()) {
                 model.addAttribute("mensagem", "🎉 Parabéns! Você acertou!");
                 model.addAttribute("sucesso", true);
@@ -83,6 +92,24 @@ public class EmbaralharAlunoController {
         } catch (Exception e) {
             model.addAttribute("erro", "Erro ao processar resposta: " + e.getMessage());
             return "jogo";
+        }
+    }
+
+    // ✅ NOVO: recebe resposta em JSON para o Angular
+    @PostMapping("/enviar-resposta-json")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> enviarRespostaJson(@RequestBody Map<String, Object> body) {
+        Long gameId = Long.valueOf(body.get("gameId").toString());
+        String resposta = body.get("resposta").toString();
+        try {
+            GameAttempt attempt = gameService.saveAttempt(gameId, resposta);
+            Map<String, Object> response = new HashMap<>();
+            response.put("correct", attempt.getCorrect());
+            response.put("studentAnswer", attempt.getStudentAnswer());
+            response.put("attemptedAt", attempt.getAttemptedAt().toString());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("erro", e.getMessage()));
         }
     }
 }
