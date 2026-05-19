@@ -217,57 +217,122 @@
             <h1>👨‍🏫 Painel do Professor</h1>
             <a href="https://projeto-letramento.vercel.app/dashboard" class="btn-voltar">← Voltar</a>
         </div>
-        
-        <div th:if="${sucesso}" class="alert alert-success" th:text="${sucesso}"></div>
-        <div th:if="${erro}" class="alert alert-error" th:text="${erro}"></div>
-        
+
+        <div id="alertBox"></div>
+
         <div class="form-section">
             <h2>Criar Novo Jogo</h2>
-            <form method="POST" action="/embaralhar/professor/criar-jogo" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="palavra">Palavra</label>
-                    <input type="text" id="palavra" name="palavra" placeholder="Digite a palavra..." required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="imagem">Imagem</label>
-                    <input type="file" id="imagem" name="imagem" accept="image/*" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="dificuldade">Dificuldade</label>
-                    <select id="dificuldade" name="dificuldade" required>
-                        <option value="EASY">Fácil - Só embaralha as letras da palavra</option>
-                        <option value="HARD">Difícil - Adiciona letras extras embaralhadas</option>
-                    </select>
-                </div>
-                
-                <button type="submit" class="btn-criar">Criar Jogo</button>
-            </form>
-        </div>
-        
-        <h2>Meus Jogos</h2>
-        
-        <div th:if="${games.isEmpty()}" class="empty-message">
-            Nenhum jogo criado ainda. Crie um novo jogo acima!
-        </div>
-        
-        <div class="games-grid" th:if="${!games.isEmpty()}">
-            <div class="game-card" th:each="game : ${games}">
-                <img th:src="'data:image/jpeg;base64,' + ${imageMap[game.id]}" 
-                     th:alt="${game.word}">
-                <h3 th:text="${#strings.toUpperCase(game.word)}"></h3>
-                <p th:text="${'Dificuldade: ' + (game.difficulty != null ? (game.difficulty.name() == 'EASY' ? 'Fácil' : 'Difícil') : 'Fácil')}"></p>
-                <p th:text="${'Criado em: ' + #temporals.format(game.createdAt, 'dd/MM/yyyy HH:mm')}"></p>
-                
-                <div class="btn-group">
-                    <a th:href="'/embaralhar/professor/detalhes/' + ${game.id}" class="btn-small btn-detalhes">Ver Detalhes</a>
-                    <form method="POST" th:action="'/embaralhar/professor/desativar/' + ${game.id}" style="flex: 1;">
-                        <button type="submit" class="btn-small btn-desativar" style="width: 100%; cursor: pointer;">Desativar</button>
-                    </form>
-                </div>
+            <!-- ✅ ALTERADO: removido method/action do form, agora usa fetch via JS -->
+            <div class="form-group">
+                <label for="palavra">Palavra</label>
+                <input type="text" id="palavra" placeholder="Digite a palavra..." required>
             </div>
+            <div class="form-group">
+                <label for="imagem">Imagem</label>
+                <input type="file" id="imagem" accept="image/*" required>
+            </div>
+            <div class="form-group">
+                <label for="dificuldade">Dificuldade</label>
+                <select id="dificuldade">
+                    <option value="EASY">Fácil - Só embaralha as letras da palavra</option>
+                    <option value="HARD">Difícil - Adiciona letras extras embaralhadas</option>
+                </select>
+            </div>
+            <!-- ✅ ALTERADO: button com onclick em vez de submit -->
+            <button class="btn-criar" onclick="criarJogo()">Criar Jogo</button>
+        </div>
+
+        <h2>Meus Jogos</h2>
+
+        <div id="listaJogos">
+            <!-- ✅ ALTERADO: jogos carregados via JS em vez de Thymeleaf -->
+            <p class="empty-message">Carregando jogos...</p>
         </div>
     </div>
+
+    <script>
+        // ✅ NOVO: URL base do backend centralizada
+        const API = 'https://projeto-letramento-production.up.railway.app';
+
+        // ✅ NOVO: carrega jogos via fetch ao abrir a página
+        async function carregarJogos() {
+            try {
+                const response = await fetch(`${API}/embaralhar/professor/jogos`);
+                if (!response.ok) throw new Error('Erro ao carregar jogos');
+                const jogos = await response.json();
+                renderizarJogos(jogos);
+            } catch (error) {
+                document.getElementById('listaJogos').innerHTML =
+                    '<p class="empty-message">Erro ao carregar jogos.</p>';
+            }
+        }
+
+        function renderizarJogos(jogos) {
+            const div = document.getElementById('listaJogos');
+            if (!jogos || jogos.length === 0) {
+                div.innerHTML = '<p class="empty-message">Nenhum jogo criado ainda. Crie um novo jogo acima!</p>';
+                return;
+            }
+            div.innerHTML = `<div class="games-grid">${jogos.map(jogo => `
+                <div class="game-card">
+                    <img src="data:image/jpeg;base64,${jogo.imagemBase64}" alt="${jogo.palavra}">
+                    <h3>${jogo.palavra.toUpperCase()}</h3>
+                    <p>Dificuldade: ${jogo.dificuldade === 'EASY' ? 'Fácil' : 'Difícil'}</p>
+                    <p>Criado em: ${jogo.criadoEm}</p>
+                    <div class="btn-group">
+                        <a href="${API}/embaralhar/professor/detalhes/${jogo.id}" class="btn-small btn-detalhes">Ver Detalhes</a>
+                        <button class="btn-small btn-desativar" onclick="desativarJogo(${jogo.id})">Desativar</button>
+                    </div>
+                </div>`).join('')}
+            </div>`;
+        }
+
+        // ✅ NOVO: criar jogo via fetch com FormData
+        async function criarJogo() {
+            const palavra = document.getElementById('palavra').value.trim();
+            const imagem = document.getElementById('imagem').files[0];
+            const dificuldade = document.getElementById('dificuldade').value;
+
+            if (!palavra) { mostrarAlerta('Por favor, digite uma palavra', 'error'); return; }
+            if (!imagem) { mostrarAlerta('Por favor, selecione uma imagem', 'error'); return; }
+
+            const formData = new FormData();
+            formData.append('palavra', palavra);
+            formData.append('imagem', imagem);
+            formData.append('dificuldade', dificuldade);
+
+            try {
+                const response = await fetch(`${API}/embaralhar/professor/criar-jogo`, {
+                    method: 'POST',
+                    body: formData
+                });
+                if (!response.ok) throw new Error('Erro ao criar jogo');
+                mostrarAlerta('Jogo criado com sucesso!', 'success');
+                document.getElementById('palavra').value = '';
+                document.getElementById('imagem').value = '';
+                carregarJogos();
+            } catch (error) {
+                mostrarAlerta('Erro ao criar jogo: ' + error.message, 'error');
+            }
+        }
+
+        // ✅ NOVO: desativar jogo via fetch
+        async function desativarJogo(id) {
+            try {
+                await fetch(`${API}/embaralhar/professor/desativar/${id}`, { method: 'POST' });
+                carregarJogos();
+            } catch (error) {
+                mostrarAlerta('Erro ao desativar jogo', 'error');
+            }
+        }
+
+        function mostrarAlerta(mensagem, tipo) {
+            const box = document.getElementById('alertBox');
+            box.innerHTML = `<div class="alert alert-${tipo === 'success' ? 'success' : 'error'}">${mensagem}</div>`;
+            setTimeout(() => box.innerHTML = '', 4000);
+        }
+
+        carregarJogos();
+    </script>
 </body>
 </html>

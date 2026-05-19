@@ -4,13 +4,16 @@ import br.com.projeto_letramento.projeto_letramento.model.Difficulty;
 import br.com.projeto_letramento.projeto_letramento.model.Game;
 import br.com.projeto_letramento.projeto_letramento.service.GameService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -34,13 +37,31 @@ public class EmbaralharProfessorController {
         return "professor";
     }
 
+    // ✅ NOVO: endpoint JSON para o fetch do professor.html
+    @GetMapping("/jogos")
+    @ResponseBody
+    public ResponseEntity<List<Map<String, Object>>> listarJogos() {
+        List<Game> games = gameService.getAllActiveGames();
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        List<Map<String, Object>> result = games.stream().map(game -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", game.getId());
+            map.put("palavra", game.getWord());
+            map.put("dificuldade", game.getDifficulty() != null ? game.getDifficulty().name() : "EASY");
+            map.put("criadoEm", game.getCreatedAt() != null ? game.getCreatedAt().format(fmt) : "");
+            map.put("imagemBase64", Base64.getEncoder().encodeToString(game.getImage()));
+            return map;
+        }).collect(Collectors.toList());
+        return ResponseEntity.ok(result);
+    }
+
     @PostMapping("/criar-jogo")
     public String criarJogo(
             @RequestParam("palavra") String palavra,
             @RequestParam("imagem") MultipartFile imagem,
             @RequestParam("dificuldade") Difficulty dificuldade,
             Model model) {
-        
+
         try {
             if (imagem == null || imagem.isEmpty()) {
                 model.addAttribute("erro", "Por favor, selecione uma imagem");
@@ -59,25 +80,20 @@ public class EmbaralharProfessorController {
             }
 
             byte[] imageBytes = imagem.getBytes();
-            Game game = gameService.createGame(palavra.trim(), imageBytes, imagem.getOriginalFilename(), dificuldade);
-            
+            gameService.createGame(palavra.trim(), imageBytes, imagem.getOriginalFilename(), dificuldade);
+
             model.addAttribute("sucesso", "Jogo criado com sucesso!");
             List<Game> games = gameService.getAllActiveGames();
             model.addAttribute("games", games);
             model.addAttribute("imageMap", buildImageMap(games));
-            
             return "professor";
         } catch (IOException e) {
-            System.err.println("Erro IO ao criar jogo: " + e.getMessage());
-            e.printStackTrace();
             model.addAttribute("erro", "Erro ao processar a imagem: " + e.getMessage());
             List<Game> games = gameService.getAllActiveGames();
             model.addAttribute("games", games);
             model.addAttribute("imageMap", buildImageMap(games));
             return "professor";
         } catch (Exception e) {
-            System.err.println("Erro ao criar jogo: " + e.getMessage());
-            e.printStackTrace();
             model.addAttribute("erro", "Erro ao criar jogo: " + e.getMessage());
             List<Game> games = gameService.getAllActiveGames();
             model.addAttribute("games", games);
@@ -86,9 +102,15 @@ public class EmbaralharProfessorController {
         }
     }
 
+    // ✅ NOVO: endpoint JSON para desativar via fetch
     @PostMapping("/desativar/{id}")
-    public String desativarJogo(@PathVariable Long id) {
+    public Object desativarJogo(@PathVariable Long id,
+                                 @RequestHeader(value = "Accept", defaultValue = "") String accept) {
         gameService.deactivateGame(id);
+        // ✅ se a requisição vier do fetch (JSON), retorna JSON; senão redireciona
+        if (accept.contains("application/json")) {
+            return ResponseEntity.ok(Map.of("status", "desativado"));
+        }
         return "redirect:/embaralhar/professor";
     }
 

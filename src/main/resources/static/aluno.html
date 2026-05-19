@@ -385,8 +385,10 @@
         <button class="btn-primary" onclick="location.reload()" style="margin-top: 20px;">Jogar Novamente</button>
     </div>
 
-    <script>
-        // Variáveis globais
+     <script>
+        // ✅ NOVO: URL base do backend centralizada
+        const API = 'https://projeto-letramento-production.up.railway.app';
+
         let codigoSalaAtual = null;
         let meuNome = null;
         let minhaCartela = [];
@@ -400,7 +402,7 @@
             msg.lang = 'pt-BR';
             msg.rate = 0.9;
             msg.pitch = 1.1;
-            window.speechSynthesis.cancel(); // evita sobreposição
+            window.speechSynthesis.cancel();
             window.speechSynthesis.speak(msg);
         }
 
@@ -414,7 +416,8 @@
             }
 
             try {
-                const response = await fetch(`/api/bingo/sala/${codigo}/aluno/entrar?nome=${encodeURIComponent(nome)}`, {
+                // ✅ ALTERADO: URL relativa → absoluta
+                const response = await fetch(`${API}/api/bingo/sala/${codigo}/aluno/entrar?nome=${encodeURIComponent(nome)}`, {
                     method: 'POST'
                 });
 
@@ -435,8 +438,6 @@
 
                 gerarCartela();
                 atualizarProgresso();
-
-                // Iniciar monitoramento
                 monitorarSala();
                 setInterval(monitorarSala, 2000);
 
@@ -462,19 +463,15 @@
         function gerarCartela() {
             const div = document.getElementById('cartela');
             div.innerHTML = '';
-
             minhaCartela.sort((a, b) => a - b);
-
             const colunas = [[], [], [], [], []];
             minhaCartela.forEach((numero, index) => {
                 const colunaIndex = Math.floor(index / 5);
                 colunas[colunaIndex].push(numero);
             });
-
             colunas.forEach(colunaNumeros => {
                 const coluna = document.createElement('div');
                 coluna.className = 'coluna';
-
                 colunaNumeros.forEach(numero => {
                     const d = document.createElement('div');
                     d.className = 'numero nao-sorteado';
@@ -483,79 +480,60 @@
                     d.onclick = () => marcarNumeroPronta(numero);
                     coluna.appendChild(d);
                 });
-
                 div.appendChild(coluna);
             });
-
             atualizarProgresso();
         }
 
         function marcarNumeroPronta(numero) {
-            // Só permite marcar se foi sorteado
-            if (!numerosSorteados.has(numero)) {
-                return;
-            }
-
+            if (!numerosSorteados.has(numero)) return;
             marcarNumero(numero);
         }
 
         async function marcarNumero(numero) {
             if (ganhou) return;
-
             const elemento = document.getElementById('n' + numero);
             if (!elemento) return;
-
             const jaEstaMarc = numerosMarcados.has(numero);
-
             if (jaEstaMarc) {
-                // Desmarcar
                 numerosMarcados.delete(numero);
                 elemento.classList.remove('marcado');
                 elemento.classList.add('sorteado-nao-marcado');
             } else {
-                // Marcar
                 numerosMarcados.add(numero);
                 elemento.classList.add('marcado');
                 elemento.classList.remove('sorteado-nao-marcado');
             }
-
-            // Enviar para servidor
             try {
                 const endpoint = jaEstaMarc ? 'desmarcar' : 'marcar';
+                // ✅ ALTERADO: URL relativa → absoluta
                 await fetch(
-                    `/api/bingo/sala/${codigoSalaAtual}/aluno/${encodeURIComponent(meuNome)}/${endpoint}?numero=${numero}`,
+                    `${API}/api/bingo/sala/${codigoSalaAtual}/aluno/${encodeURIComponent(meuNome)}/${endpoint}?numero=${numero}`,
                     { method: 'POST' }
                 );
             } catch (error) {
                 console.error('Erro ao marcar:', error);
             }
-
             atualizarProgresso();
             verificarVitoria();
         }
 
         async function monitorarSala() {
             if (!codigoSalaAtual) return;
-
             try {
-                const response = await fetch(`/api/bingo/sala/${codigoSalaAtual}`);
+                // ✅ ALTERADO: URL relativa → absoluta
+                const response = await fetch(`${API}/api/bingo/sala/${codigoSalaAtual}`);
                 if (!response.ok) return;
-
                 const data = await response.json();
                 const sorteados = new Set(data.sorteados);
-
-                // Atualizar todos os números
                 minhaCartela.forEach(numero => {
                     const elemento = document.getElementById('n' + numero);
                     if (!elemento) return;
-
                     const foiSorteado = sorteados.has(numero);
                     const estaMarcado = numerosMarcados.has(numero);
-
                     if (foiSorteado) {
                         numerosSorteados.add(numero);
                         elemento.classList.remove('nao-sorteado');
-
                         if (!estaMarcado) {
                             elemento.classList.add('sorteado-nao-marcado');
                         } else {
@@ -568,18 +546,14 @@
                         elemento.classList.remove('sorteado-nao-marcado', 'marcado');
                     }
                 });
-
-                // Atualizar número display
                 if (data.sorteados && data.sorteados.length > 0) {
                     const ultimoSorteado = data.sorteados[data.sorteados.length - 1];
                     if (ultimoSorteado !== ultimoNumeroSorteado) {
-                            ultimoNumeroSorteado = ultimoSorteado;
-                            document.getElementById('numeroDisplay').textContent = ultimoSorteado;
-
-                            falarNumero(ultimoSorteado); // 🔊 FALA O NÚMERO
-                        }
+                        ultimoNumeroSorteado = ultimoSorteado;
+                        document.getElementById('numeroDisplay').textContent = ultimoSorteado;
+                        falarNumero(ultimoSorteado);
+                    }
                 } else {
-                    // Reset se não há números sorteados
                     if (ultimoNumeroSorteado !== null) {
                         ultimoNumeroSorteado = null;
                         document.getElementById('numeroDisplay').textContent = '-';
@@ -594,13 +568,12 @@
             const total = minhaCartela.length || 25;
             if (numerosMarcados.size === total && total > 0 && !ganhou) {
                 ganhou = true;
-
                 try {
+                    // ✅ ALTERADO: URL relativa → absoluta
                     const response = await fetch(
-                        `/api/bingo/sala/${codigoSalaAtual}/aluno/${encodeURIComponent(meuNome)}/bingo`
+                        `${API}/api/bingo/sala/${codigoSalaAtual}/aluno/${encodeURIComponent(meuNome)}/bingo`
                     );
                     const data = await response.json();
-                    
                     if (data.bingo) {
                         document.getElementById('overlay').classList.add('show');
                         document.getElementById('vitoria').style.display = 'block';
@@ -623,9 +596,7 @@
         }
 
         function sairSala() {
-            if (confirm('Deseja sair da sala?')) {
-                location.reload();
-            }
+            if (confirm('Deseja sair da sala?')) location.reload();
         }
 
         function mostrarStatus(elementId, mensagem, tipo) {
@@ -638,37 +609,26 @@
                 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 const oscillator = audioContext.createOscillator();
                 const gainNode = audioContext.createGain();
-
                 oscillator.connect(gainNode);
                 gainNode.connect(audioContext.destination);
-
                 oscillator.frequency.value = 800;
                 oscillator.type = 'sine';
-
                 gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
                 gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
-
                 oscillator.start(audioContext.currentTime);
                 oscillator.stop(audioContext.currentTime + 0.2);
-            } catch (e) {
-                // Som não disponível
-            }
+            } catch (e) {}
         }
 
-        // Auto focus no primeiro input
         window.onload = () => {
             document.getElementById('meuNome').focus();
         };
-        
-        function falarInstrucao() {
-            const msg = new SpeechSynthesisUtterance(
-                'Clique no botão azul para voltar para a tela de jogos'
-            );
 
+        function falarInstrucao() {
+            const msg = new SpeechSynthesisUtterance('Clique no botão azul para voltar para a tela de jogos');
             msg.lang = 'pt-BR';
             msg.rate = 0.9;
             msg.pitch = 1.1;
-
             window.speechSynthesis.cancel();
             window.speechSynthesis.speak(msg);
         }

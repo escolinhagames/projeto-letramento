@@ -145,40 +145,56 @@
     <div class="container">
         <div class="header">
             <h1>👨‍🎓 Escolha um Jogo</h1>
-            <button class="btn-audio" onclick="falarInstrucao()">🔊 </button>
-            </h1> 
+            <button class="btn-audio" onclick="falarInstrucao()">🔊</button>
             <a href="https://projeto-letramento.vercel.app/aluno-dashboard" class="btn-voltar">← Voltar</a>
         </div>
-        
+
         <h2>Jogos Disponíveis</h2>
-        
-        <div th:if="${games.isEmpty()}" class="empty-message">
-            Nenhum jogo disponível no momento. Tente novamente mais tarde!
-        </div>
-        
-        <div class="games-grid" th:if="${!games.isEmpty()}">
-            <div class="game-card" th:each="game : ${games}">
-                <img th:src="'data:image/jpeg;base64,' + ${imageMap[game.id]}" 
-                     th:alt="Jogo">
-                <h3>Desafio #<span th:text="${game.id}"></span></h3>
-                <p style="color: #999; margin-bottom: 15px;">Adivinhe a palavra!</p>
-                <a th:href="'/embaralhar/aluno/jogo/' + ${game.id}" class="btn-jogar">Jogar →</a>
-            </div>
+
+        <!-- ✅ ALTERADO: jogos carregados via fetch em vez de Thymeleaf -->
+        <div id="listaJogos">
+            <p class="empty-message">Carregando jogos...</p>
         </div>
     </div>
-</body>
-<script>
-    function falarInstrucao() {
-            const msg = new SpeechSynthesisUtterance(
-                'Clique no botão azul para voltar para a tela de jogos'
-            );
 
+    <script>
+        // ✅ NOVO: URL base do backend centralizada
+        const API = 'https://projeto-letramento-production.up.railway.app';
+
+        async function carregarJogos() {
+            try {
+                const response = await fetch(`${API}/embaralhar/aluno/jogos`);
+                if (!response.ok) throw new Error('Erro');
+                const jogos = await response.json();
+                const div = document.getElementById('listaJogos');
+                if (!jogos || jogos.length === 0) {
+                    div.innerHTML = '<p class="empty-message">Nenhum jogo disponível no momento.</p>';
+                    return;
+                }
+                div.innerHTML = `<div class="games-grid">${jogos.map(jogo => `
+                    <div class="game-card">
+                        <img src="data:image/jpeg;base64,${jogo.imagemBase64}" alt="Jogo">
+                        <h3>Desafio #${jogo.id}</h3>
+                        <p style="color: #999; margin-bottom: 15px;">Adivinhe a palavra!</p>
+                        <button class="btn-jogar" onclick="window.location.href='${API}/embaralhar/aluno/jogo/${jogo.id}'">Jogar →</button>
+                    </div>`).join('')}
+                </div>`;
+            } catch (error) {
+                document.getElementById('listaJogos').innerHTML =
+                    '<p class="empty-message">Erro ao carregar jogos.</p>';
+            }
+        }
+
+        function falarInstrucao() {
+            const msg = new SpeechSynthesisUtterance('Clique no botão azul para voltar para a tela de jogos');
             msg.lang = 'pt-BR';
             msg.rate = 0.9;
             msg.pitch = 1.1;
-
             window.speechSynthesis.cancel();
             window.speechSynthesis.speak(msg);
         }
-</script>
+
+        carregarJogos();
+    </script>
+</body>
 </html>
