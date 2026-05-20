@@ -207,4 +207,11 @@ public class BingoSalaController {
         
         return ResponseEntity.ok(response);
     }
+    
+    @GetMapping("/ativas")
+    public ResponseEntity<List<Map<String, Object>>> listarSalasAtivas() {
+        // adicione esse método ao BingoService também
+        List<Map<String, Object>> salas = bingoService.listarSalasAtivas();
+        return ResponseEntity.ok(salas);
+    }
 }

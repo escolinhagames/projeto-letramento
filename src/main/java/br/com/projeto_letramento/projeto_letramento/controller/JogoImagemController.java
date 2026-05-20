@@ -1,6 +1,7 @@
 package br.com.projeto_letramento.projeto_letramento.controller;
 
 import br.com.projeto_letramento.projeto_letramento.model.JogoImagemModel;
+import br.com.projeto_letramento.projeto_letramento.repository.ProfessorRepository;
 import br.com.projeto_letramento.projeto_letramento.service.JogoImagemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,8 @@ import java.util.stream.Collectors;
 public class JogoImagemController {
 
     private final JogoImagemService service;
+    // ✅ NOVO: injetado para buscar nome do professor
+    private final ProfessorRepository professorRepository;
 
     private Map<String, Object> toMap(JogoImagemModel j) {
         Map<String, Object> m = new HashMap<>();
@@ -30,6 +33,11 @@ public class JogoImagemController {
         m.put("imagem2", Base64.getEncoder().encodeToString(j.getImagem2()));
         m.put("imagem3", Base64.getEncoder().encodeToString(j.getImagem3()));
         m.put("criadoEm", j.getCriadoEm());
+        // ✅ NOVO: busca nome do professor pelo id
+        String nomeProfessor = professorRepository.findById(j.getProfessorId())
+            .map(p -> p.getNome())
+            .orElse("Professor");
+        m.put("nomeProfessor", nomeProfessor);
         return m;
     }
 

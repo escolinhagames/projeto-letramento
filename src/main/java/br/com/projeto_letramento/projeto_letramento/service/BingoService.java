@@ -61,4 +61,16 @@ public class BingoService {
         
         return codigoStr;
     }
+
+    public List<Map<String, Object>> listarSalasAtivas() {
+    return salas.values().stream()
+        .filter(SalaJogo::isAtiva)
+        .map(sala -> {
+            Map<String, Object> map = new java.util.HashMap<>();
+            map.put("codigo", sala.getCodigo());
+            map.put("professor", sala.getProfessor());
+            return map;
+        })
+        .collect(java.util.stream.Collectors.toList());
+    }
 }
