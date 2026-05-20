@@ -124,4 +124,11 @@ public class EmbaralharProfessorController {
         }
         return "detalhes-jogo";
     }
+    
+    @DeleteMapping("/deletar/{id}")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> deletarJogo(@PathVariable Long id) {
+        gameService.deleteGame(id);
+        return ResponseEntity.ok(Map.of("status", "deletado"));
+    }
 }

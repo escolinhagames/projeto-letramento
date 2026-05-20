@@ -71,4 +71,7 @@ public class GameService {
             gameRepository.save(game);
         }
     }
+    public void deleteGame(Long id) {
+        gameRepository.deleteById(id);
+    }
 }
