@@ -1,5 +1,6 @@
 package br.com.projeto_letramento.projeto_letramento.model;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -18,7 +19,9 @@ public class SalaJogo {
     private static final int TAMANHO_CARTELA = 25;  // 5x5
     private static final int MAXIMO_NUMERO = 50;
     private static final int LIMITE_BINGO = 5; // Número de alunos que precisam completar a cartela para encerrar o jogo
-
+    private LocalDateTime criadoEm = LocalDateTime.now();
+    public LocalDateTime getCriadoEm() { return criadoEm; }
+    
     public SalaJogo(String codigo, String professor) {
         this.codigo = codigo;
         this.professor = professor;

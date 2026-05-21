@@ -2,6 +2,8 @@ package br.com.projeto_letramento.projeto_letramento.service;
 
 import org.springframework.stereotype.Service;
 import br.com.projeto_letramento.projeto_letramento.model.SalaJogo;
+
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -16,6 +18,7 @@ public class BingoService {
      * Cria uma nova sala de jogo
      */
     public SalaJogo criarSala(String professor) {
+        limparSalasAntigas();
         String codigo = gerarCodigo();
         SalaJogo sala = new SalaJogo(codigo, professor);
         salas.put(codigo, sala);
@@ -72,5 +75,13 @@ public class BingoService {
             return map;
         })
         .collect(java.util.stream.Collectors.toList());
+    }
+
+    private void limparSalasAntigas() {
+        LocalDateTime limite = LocalDateTime.now().minusHours(2);
+        salas.entrySet().removeIf(entry -> 
+            entry.getValue().getCriadoEm() != null && 
+            entry.getValue().getCriadoEm().isBefore(limite)
+        );
     }
 }
