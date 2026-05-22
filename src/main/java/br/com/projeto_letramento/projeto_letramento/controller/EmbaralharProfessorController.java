@@ -125,7 +125,7 @@ public class EmbaralharProfessorController {
         return "detalhes-jogo";
     }
     
-    @DeleteMapping("/deletar/{id}")
+    @PostMapping("/deletar/{id}")
     @ResponseBody
     public ResponseEntity<Map<String, String>> deletarJogo(@PathVariable Long id) {
         gameService.deleteGame(id);
