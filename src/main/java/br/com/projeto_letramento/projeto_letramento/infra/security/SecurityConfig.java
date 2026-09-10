@@ -50,6 +50,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/jogo-imagem/**").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/jogo-imagem/**").permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/jogo-imagem/**").permitAll()
+                        .requestMatchers("/matematica/**").permitAll()
                         .requestMatchers("/*.html").permitAll()
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
