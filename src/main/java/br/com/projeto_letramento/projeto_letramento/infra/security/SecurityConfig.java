@@ -38,6 +38,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/professores/login").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/jogo/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/jogo/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/jogos/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/jogos/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/bingo/**").permitAll()
