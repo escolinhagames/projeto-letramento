@@ -1,5 +1,7 @@
-package br.com.projeto_letramento.projeto_letramento.game;
+package br.com.projeto_letramento.projeto_letramento.controller;
 
+import br.com.projeto_letramento.projeto_letramento.model.Estado;
+import br.com.projeto_letramento.projeto_letramento.service.MapaService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,11 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/jogo")
 @CrossOrigin(origins = "*")
-public class GameController {
+public class MapaController {
 
-    private final GameService gameService;
+    private final MapaService gameService;
 
-    public GameController(@Qualifier("estadoGameService") GameService gameService) {
+    public MapaController(@Qualifier("estadoGameService") MapaService gameService) {
         this.gameService = gameService;
     }
 

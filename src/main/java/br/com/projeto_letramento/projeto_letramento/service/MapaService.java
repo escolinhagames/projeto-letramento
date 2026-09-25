@@ -1,5 +1,6 @@
-package br.com.projeto_letramento.projeto_letramento.game;
+package br.com.projeto_letramento.projeto_letramento.service;
 
+import br.com.projeto_letramento.projeto_letramento.model.Estado;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicReference;
@@ -7,7 +8,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.springframework.stereotype.Service;
 
 @Service("estadoGameService")
-public class GameService {
+public class MapaService {
 
     private static final List<Estado> ESTADOS = List.of(
         new Estado("AC", "Acre"),
@@ -41,7 +42,7 @@ public class GameService {
 
     private final AtomicReference<Estado> estadoAtual = new AtomicReference<>();
 
-    public GameService() {
+    public MapaService() {
         this.estadoAtual.set(sortearEstado(null));
     }
 

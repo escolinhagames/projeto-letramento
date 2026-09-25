@@ -1,16 +1,17 @@
-package br.com.projeto_letramento.projeto_letramento.game;
+package br.com.projeto_letramento.projeto_letramento.service;
 
+import br.com.projeto_letramento.projeto_letramento.model.Estado;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
 
-class GameServiceTest {
+class MapaServiceTest {
 
     @Test
     void deveSorteiarEstadoInicial() {
-        GameService service = new GameService();
+        MapaService service = new MapaService();
 
         Estado estado = service.getEstadoAtual();
 
@@ -21,7 +22,7 @@ class GameServiceTest {
 
     @Test
     void deveGerarOutroEstadoQuandoMudar() {
-        GameService service = new GameService();
+        MapaService service = new MapaService();
         Estado estadoAtual = service.getEstadoAtual();
 
         Estado novoEstado = service.mudarEstado();
