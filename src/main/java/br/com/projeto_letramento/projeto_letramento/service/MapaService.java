@@ -41,6 +41,7 @@ public class MapaService {
     );
 
     private final AtomicReference<Estado> estadoAtual = new AtomicReference<>();
+    private final AtomicReference<String> dificuldadeAtual = new AtomicReference<>("facil");
 
     public MapaService() {
         this.estadoAtual.set(sortearEstado(null));
@@ -48,6 +49,20 @@ public class MapaService {
 
     public Estado getEstadoAtual() {
         return estadoAtual.get();
+    }
+
+    public String getDificuldadeAtual() {
+        return dificuldadeAtual.get();
+    }
+
+    public String setDificuldade(String dificuldade) {
+        String nivel = (dificuldade == null || dificuldade.isBlank()) ? "facil" : dificuldade.trim().toLowerCase();
+        if (!"facil".equals(nivel) && !"dificil".equals(nivel)) {
+            nivel = "facil";
+        }
+
+        dificuldadeAtual.set(nivel);
+        return dificuldadeAtual.get();
     }
 
     public Estado mudarEstado() {
